@@ -4,64 +4,160 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
+<!-- 這裡放置 Google AdSense 腳本 -->
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840" crossorigin="anonymous"></script>
 
+	<!-- 專門為 IP 查詢工具添加的 CSS 樣式 (解決格式跑掉和置中問題) -->
+	<style>
+		/* 確保 Header 和 Footer 之間的主內容區塊置中 */
+		.ip-main-content {
+			width: calc(100% - 2em);
+			max-width: 1200px;
+			margin: 0 auto; /* 核心置中樣式 */
+			padding: 2em 1em;
+		}
+		
+		/* IP 卡片樣式 */
+		.card {
+			max-width: 600px;
+			margin: 40px auto; /* 內容卡片置中 */
+			padding: 30px;
+			background-color: #ffffff;
+			border-radius: 16px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			text-align: center; /* 讓卡片內的文字置中 */
+		}
 
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的 IP 查詢</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
-     crossorigin="anonymous"></script>
+		.card h1 {
+			font-size: 1.5rem;
+			color: #333;
+			margin-bottom: 1rem;
+		}
+
+		.ip-address {
+			font-size: 2.5rem;
+			font-weight: bold;
+			color: #007bff; /* 主題色 */
+			background-color: #f7f9fc;
+			padding: 15px;
+			border-radius: 10px;
+			margin-bottom: 25px;
+			word-break: break-all;
+		}
+
+		/* 詳細資訊網格佈局 */
+		.details {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 15px;
+			margin-bottom: 30px;
+			text-align: left; /* 讓詳細資訊的文字靠左 */
+		}
+
+		.detail-box {
+			background-color: #f0f4f8;
+			padding: 15px;
+			border-radius: 8px;
+			font-size: 0.95rem;
+			color: #555;
+			font-weight: 500;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+		}
+
+		.card button {
+			padding: 12px 30px;
+			background-color: #007bff;
+			color: white;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 1rem;
+			font-weight: bold;
+			transition: background-color 0.2s ease;
+		}
+
+		.card button:hover {
+			background-color: #0056b3;
+		}
+	</style>
 </head>
-<body>
-<div>
-    <h1>你的 IP 是</h1>
-    <div class="ip-address" id="ip">載入中...</div>
-    <div class="details" id="details">
-        <div class="detail-box">國家：-</div>
-        <div class="detail-box">城市：-</div>
-        <div class="detail-box">ISP：-</div>
-        <div class="detail-box">時區：-</div>
-    </div>
-    <button onclick="fetchIP()">重新整理</button>
-</div>
+    <body>
+	<!-- 這裡放置 Header 元件，這是確保 Header 顯示的關鍵 -->
+	<Header /> 
+	
+	<!-- main 標籤應用置中樣式 -->
+	<main class="ip-main-content">
+		<!-- 您的 IP 查詢內容，使用 card class 確保美觀和置中 -->
+		<div class="card">
+			<h1>你的 IP 是</h1>
+			<div class="ip-address" id="ip">載入中...</div>
+			
+			<div class="details" id="details">
+				<div class="detail-box">國家：-</div>
+				<div class="detail-box">城市：-</div>
+				<div class="detail-box">ISP：-</div>
+				<div class="detail-box">時區：-</div>
+			</div>
+			
+			<button onclick="fetchIP()">重新整理</button>
+		</div>
+	</main>
+	
+	<!-- 這裡放置 Footer 元件，這是確保 Footer 顯示的關鍵 -->
+	<Footer /> 
+	
+	<!-- JavaScript 邏輯 -->
+	<script>
+        // IP Info 授權金鑰
+		const IP_INFO_TOKEN = '1b172809b09566'; 
 
-<script>
-async function fetchIP() {
-    document.getElementById('ip').textContent = '載入中...';
-    document.getElementById('details').innerHTML = `
-        <div class="detail-box">國家：載入中</div>
-        <div class="detail-box">城市：載入中</div>
-        <div class="detail-box">ISP：載入中</div>
-        <div class="detail-box">時區：載入中</div>
-    `;
-    try {
-        // 先取得 IP
-        const ipRes = await fetch('https://api.ipify.org?format=json');
-        const ipData = await ipRes.json();
-        const ip = ipData.ip;
-        document.getElementById('ip').textContent = ip;
+		async function fetchIP() {
+			const ipDisplay = document.getElementById('ip');
+			const detailsDisplay = document.getElementById('details');
 
-        // 再取得詳細資訊
-        const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
-        const infoData = await infoRes.json();
+			ipDisplay.textContent = '載入中...';
+			detailsDisplay.innerHTML = `
+				<div class="detail-box">國家：載入中</div>
+				<div class="detail-box">城市：載入中</div>
+				<div class="detail-box">ISP：載入中</div>
+				<div class="detail-box">時區：載入中</div>
+			`;
+			try {
+				// 1. 取得 IP
+				const ipRes = await fetch('https://api.ipify.org?format=json');
+				const ipData = await ipRes.json();
+				const ip = ipData.ip;
+				ipDisplay.textContent = ip;
 
-        document.getElementById('details').innerHTML = `
-            <div class="detail-box">國家：${infoData.country || '-'}</div>
-            <div class="detail-box">城市：${infoData.city || '-'}</div>
-            <div class="detail-box">ISP：${infoData.org || '-'}</div>
-            <div class="detail-box">時區：${infoData.timezone || '-'}</div>
-        `;
-    } catch (error) {
-        document.getElementById('ip').textContent = '無法取得 IP';
-        document.getElementById('details').innerHTML = `
-            <div class="detail-box">請稍後再試</div>
-        `;
-    }
-}
-fetchIP();
-</script>
-</body>
+				// 2. 取得詳細資訊
+				const infoRes = await fetch(\`https://ipinfo.io/\${ip}/json?token=\${IP_INFO_TOKEN}\`);
+				const infoData = await infoRes.json();
+                
+                const country = infoData.country || 'N/A';
+                const city = infoData.city || 'N/A';
+                const org = infoData.org || 'N/A';
+                const timezone = infoData.timezone || 'N/A';
+
+				detailsDisplay.innerHTML = `
+					<div class="detail-box">國家：\${country}</div>
+					<div class="detail-box">城市：\${city}</div>
+					<div class="detail-box">ISP：\${org}</div>
+					<div class="detail-box">時區：\${timezone}</div>
+				`;
+			} catch (error) {
+				console.error("IP 查詢失敗:", error);
+				ipDisplay.textContent = '無法取得 IP';
+				detailsDisplay.innerHTML = `
+					<div class="detail-box">連線錯誤，請稍後再試。</div>
+				`;
+			}
+		}
+        
+        // 確保在頁面載入後執行查詢
+        document.addEventListener('astro:load', fetchIP);
+        if (!document.documentElement.hasAttribute('data-astro-transitions')) {
+            fetchIP();
+        }
+	</script>
+    </body>
 </html>
