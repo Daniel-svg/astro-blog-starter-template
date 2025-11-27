@@ -9,10 +9,22 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+		.timer-display {
+                margin-bottom: 2rem;
+                padding: 1rem;
+                background-color: #f7f9fc;
+                border-radius: 8px;
+                border-left: 5px solid #007bff;
+            }
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
+			<div class="timer-display">
+                <p>當前時間：<strong id="currentTime">載入中...</strong>下個假日倒數：<strong id="holidayCountdown">正在計算...</strong></p>
+            </div>
 			<h1>🧑‍🚀 網站理念與發想 💡</h1>
 				<p>在資訊爆炸的時代，我們每天都在與時間賽跑，努力在複雜的日常中尋求片刻的清晰與高效。這個小小的網站——從一個簡單的「倒數計時器」開始——便是我在日常生活中，針對各種瑣碎需求所激發出的<strong>靈感實驗室</strong>。</p>
 
@@ -21,10 +33,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				<p>我們將持續探索並新增各種從日常痛點出發的小功能，並分享背後的使用心得與程式碼發想過程。期待這裡不僅是您的計時幫手，更是您<strong>高效數位生活的一扇窗</strong>。</p>
 
 				<p style="font-size: 0.9em; color: #555;">感謝您的造訪，希望這些發想也能為您的日常帶來一點幫助。</p>
-			<div class="timer-display">
-                <p>當前時間：<strong id="currentTime">載入中...</strong></p>
-                <p>下個假日倒數：<strong id="holidayCountdown">正在計算...</strong></p>
-            </div>
 		</main>
 		<Footer />
 		<script>
