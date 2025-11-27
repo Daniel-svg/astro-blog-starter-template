@@ -2,7 +2,7 @@
 title: "在 Synology NAS 上利用 Docker 部署 Home Assistant 打造智慧家庭"
 description: "這篇文章用來在 Synology NAS 上利用 Docker 部署 Home Assistant 打造智慧家庭。"
 pubDate: "Nov 27 2025"
-heroImage: "images/homeassistant.png"
+heroImage: "/images/homeassistant.png"
 tags: ["sysnlogy", "homeassistant", "教學","Dacker"]
 ---
 
