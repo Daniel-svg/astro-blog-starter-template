@@ -87,8 +87,11 @@ const description = '快速查詢您的公開 IP 地址及地理位置資訊。'
 				transition: background-color 0.2s ease;
 			}
 
-			.card button:hover {
-				background-color: #0056b3;
+			.card {
+   				 max-width: 600px;
+   				 margin: 40px auto; /* 確保卡片本身水平置中 */
+   			 /* ... 其他屬性 ... */
+    			text-align: center; /* 讓卡片內的 H1 和 IP 地址置中 */
 			}
 		</style>
 	</head>

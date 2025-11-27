@@ -1,0 +1,131 @@
+---
+// 確保路徑正確：myip.astro 在 src/pages/tools/，故需要 ..
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+
+const title = '網段計算機';
+const description = '網段計算機，提供快速查詢可用IP位址';
+---
+
+<!doctype html>
+<html lang="zh-Hant">
+	<head>
+		<!-- 這是您頁面的頭部資訊，包含了基礎樣式和 meta 標籤 -->
+		<BaseHead title={title} description={SITE_DESCRIPTION} /> 
+		
+		<!-- 這裡放置 Google AdSense 腳本 -->
+		<script async src="[https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840](https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840)" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<!-- 這裡放置 Header 元件，這是確保 Header 顯示的關鍵 -->
+		<Header /> 
+		
+		<!-- main 標籤應用置中樣式 -->
+		<main>
+            <div>
+                <input type="text" id="cidrInput" placeholder="IP/子網 (例: 192.168.1.10/24)">
+                <input type="text" id="maskInput" placeholder="子網遮罩 (例: 255.255.255.0)">
+                <button onclick="calculate()">計算</button>
+                <div class="toggle-bin" onclick="toggleBinary()">切換二進位顯示</div>
+                <div class="results" id="results"></div>
+            </div>	
+		</main>
+        <script>
+            fetch('nav.html').then(res=>res.text()).then(html=>document.getElementById('navContainer').innerHTML=html);
+
+            let showBinary=false;
+
+            function ipToBinary(ip){
+            return ip.split('.').map(n=>parseInt(n).toString(2).padStart(8,'0')).join('.');
+            }
+            function binaryToIp(bin){
+            return bin.split('.').map(b=>parseInt(b,2)).join('.');
+            }
+
+            function isPrivateIP(ip){
+            const [a,b]=ip.split('.').map(n=>parseInt(n));
+            if(a===10) return "私有網段";
+            if(a===172 && b>=16 && b<=31) return "私有網段";
+            if(a===192 && b===168) return "私有網段";
+            if(a===127) return "迴圈本地";
+            return "公網IP";
+            }
+
+            function calculate(){
+            const cidr = document.getElementById('cidrInput').value.trim();
+            const maskVal = document.getElementById('maskInput').value.trim();
+            const results = document.getElementById('results');
+
+            let ip, mask, prefix;
+
+            if(cidr.includes('/')){
+                [ip, prefix] = cidr.split('/');
+                prefix=parseInt(prefix);
+                mask = Array(4).fill(0).map((_,i)=>{
+                let rem=prefix - i*8;
+                if(rem>=8) return 255;
+                if(rem<=0) return 0;
+                return 256 - Math.pow(2,8-rem);
+                }).join('.');
+            } else if(maskVal){
+                ip = cidr;
+                mask = maskVal;
+                prefix = mask.split('.').map(n=>parseInt(n).toString(2).split('1').length-1).reduce((a,b)=>a+b,0);
+            } else {
+                results.innerHTML="<div>請輸入有效 IP 或 CIDR</div>";
+                return;
+            }
+
+            const ipParts = ip.split('.').map(n=>parseInt(n));
+            const maskParts = mask.split('.').map(n=>parseInt(n));
+            if(ipParts.length!==4 || maskParts.length!==4 || ipParts.some(n=>isNaN(n)) || maskParts.some(n=>isNaN(n))){
+                results.innerHTML="<div>輸入格式錯誤</div>"; return;
+            }
+
+            const network = ipParts.map((n,i)=> n & maskParts[i]);
+            const broadcast = ipParts.map((n,i)=> (n & maskParts[i]) | (~maskParts[i]&255));
+            const hostMin = [...network]; hostMin[3]+=1;
+            const hostMax = [...broadcast]; hostMax[3]-=1;
+            const hostCount = Math.pow(2,32-prefix)-2;
+
+            function display(ipArr){
+                return showBinary ? ipToBinary(ipArr.join('.')) : ipArr.join('.');
+            }
+
+            results.innerHTML = `
+                <div>IP 類型: ${isPrivateIP(ip)}</div>
+                <div>網段位址: ${display(network)}</div>
+                <div>廣播位址: ${display(broadcast)}</div>
+                <div>可用主機範圍: ${display(hostMin)} - ${display(hostMax)}</div>
+                <div>可用主機數量: ${hostCount}</div>
+                <div>子網位元: /${prefix}</div>
+            `;
+            }
+            // CIDR 轉子網遮罩
+            function cidrToMask(cidr) {
+            const bits = parseInt(cidr.replace('/', ''));
+            if (isNaN(bits) || bits < 0 || bits > 32) return null;
+            let mask = [];
+            for (let i = 0; i < 4; i++) {
+                if (bits >= 8) {
+                mask.push(255);
+                } else if (bits > 0) {
+                mask.push(256 - Math.pow(2, 8 - bits));
+                } else {
+                mask.push(0);
+                }
+                bits -= 8;
+                if (bits < 0) bits = 0;
+            }
+            return mask.join('.');
+            }
+
+            function toggleBinary(){
+            showBinary = !showBinary;
+            calculate();
+            }
+		</script>
+	</body>
+</html>
