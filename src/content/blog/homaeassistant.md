@@ -124,7 +124,7 @@ Home Assistant 更新頻繁，建議定期更新：
 docker pull homeassistant/home-assistant
 docker stop home-assistant
 docker rm home-assistant
-# 再重新執行 docker run 指令
+再重新執行 docker run 指令
 
 
 不用擔心設定會消失，因為全部都存放在 /config 資料夾中。
