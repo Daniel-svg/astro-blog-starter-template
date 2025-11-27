@@ -145,7 +145,7 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
 
     <Footer />
 
-    <script>
+    <script is:inline>
         function ipToInt(ipArr){
             return (ipArr[0]>>>0)*256*256*256 +
                    (ipArr[1]>>>0)*256*256 +
