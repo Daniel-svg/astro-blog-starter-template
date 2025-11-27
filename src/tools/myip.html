@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的 IP 查詢</title>
+<link rel="stylesheet" href="style.css">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="navContainer"></div>
+<div class="card">
+    <h1>你的 IP 是</h1>
+    <div class="ip-address" id="ip">載入中...</div>
+    <div class="details" id="details">
+        <div class="detail-box">國家：-</div>
+        <div class="detail-box">城市：-</div>
+        <div class="detail-box">ISP：-</div>
+        <div class="detail-box">時區：-</div>
+    </div>
+    <button onclick="fetchIP()">重新整理</button>
+</div>
+
+<script>
+fetch('nav.html')
+  .then(res => res.text())
+  .then(html => document.getElementById('navContainer').innerHTML = html);
+async function fetchIP() {
+    document.getElementById('ip').textContent = '載入中...';
+    document.getElementById('details').innerHTML = `
+        <div class="detail-box">國家：載入中</div>
+        <div class="detail-box">城市：載入中</div>
+        <div class="detail-box">ISP：載入中</div>
+        <div class="detail-box">時區：載入中</div>
+    `;
+    try {
+        // 先取得 IP
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        const ip = ipData.ip;
+        document.getElementById('ip').textContent = ip;
+
+        // 再取得詳細資訊
+        const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
+        const infoData = await infoRes.json();
+
+        document.getElementById('details').innerHTML = `
+            <div class="detail-box">國家：${infoData.country || '-'}</div>
+            <div class="detail-box">城市：${infoData.city || '-'}</div>
+            <div class="detail-box">ISP：${infoData.org || '-'}</div>
+            <div class="detail-box">時區：${infoData.timezone || '-'}</div>
+        `;
+    } catch (error) {
+        document.getElementById('ip').textContent = '無法取得 IP';
+        document.getElementById('details').innerHTML = `
+            <div class="detail-box">請稍後再試</div>
+        `;
+    }
+}
+fetchIP();
+</script>
+</body>
+</html>

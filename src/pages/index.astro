@@ -13,38 +13,55 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<h1>🧑‍🚀 網站理念與發想 💡</h1>
+				<p>在資訊爆炸的時代，我們每天都在與時間賽跑，努力在複雜的日常中尋求片刻的清晰與高效。這個小小的網站——從一個簡單的「倒數計時器」開始——便是我在日常生活中，針對各種瑣碎需求所激發出的<strong>靈感實驗室</strong>。</p>
+
+				<p>這裡不單是提供功能的工具箱，更是一個分享生活心得與數位發想的平台。每一個上線的小工具，無論是精準掌握國定假期的倒數，還是協助您專注工作的計時器，都源自我對「如何讓生活更有效率、更少焦慮」的深入思考。我們相信，透過微小的數位輔助，可以幫助您更輕鬆地規劃時間、達成目標，並讓目光聚焦在真正重要的事情上。</p>
+
+				<p>我們將持續探索並新增各種從日常痛點出發的小功能，並分享背後的使用心得與程式碼發想過程。期待這裡不僅是您的計時幫手，更是您<strong>高效數位生活的一扇窗</strong>。</p>
+
+				<p style="font-size: 0.9em; color: #555;">感謝您的造訪，希望這些發想也能為您的日常帶來一點幫助。</p>
 		</main>
 		<Footer />
+		<script>
+			// 顯示當前時間
+			function updateTime(){
+			// [程式碼保持不變]
+			document.getElementById('currentTime').textContent = new Date().toLocaleString();
+			}
+			setInterval(updateTime,1000);
+			updateTime();
+
+			// 顯示下一個假日倒數
+			async function fetchNextHoliday(){
+			// [程式碼保持不變]
+			const year = new Date().getFullYear();
+			const res = await fetch(`https://cdn.jsdelivr.net/gh/ruyut/TaiwanCalendar/data/${year}.json`);
+			const data = await res.json();
+			const today = new Date();
+			const upcoming = data.filter(h=>h.description && new Date(h.date.slice(0,4)+'-'+h.date.slice(4,6)+'-'+h.date.slice(6,8)) >= today)
+									.sort((a,b)=>a.date.localeCompare(b.date))[0];
+			if(upcoming){
+				const target = new Date(upcoming.date.slice(0,4)+'-'+upcoming.date.slice(4,6)+'-'+upcoming.date.slice(6,8));
+				function updateCountdown(){
+				const diff = Math.floor((target-new Date())/1000);
+				if(diff>0){
+					const d=Math.floor(diff/86400),
+						h=Math.floor(diff%86400/3600),
+						m=Math.floor(diff%3600/60),
+						s=diff%60;
+					document.getElementById('holidayCountdown').textContent=`${upcoming.description} 還有 ${d} 天 ${h} 時 ${m} 分 ${s} 秒`;
+				} else {
+					document.getElementById('holidayCountdown').textContent=`${upcoming.description} 已到來！`;
+				}
+				}
+				setInterval(updateCountdown,1000);
+				updateCountdown();
+			} else {
+				document.getElementById('holidayCountdown').textContent="未找到未來假日";
+			}
+			}
+			fetchNextHoliday();
+		</script>
 	</body>
 </html>
