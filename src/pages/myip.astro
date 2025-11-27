@@ -1,14 +1,8 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
-import { getCollection } from 'astro:content';
-import FormattedDate from '../../components/FormattedDate.astro';
-
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
 
@@ -22,7 +16,7 @@ const posts = (await getCollection('blog')).sort(
      crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="card">
+<div>
     <h1>你的 IP 是</h1>
     <div class="ip-address" id="ip">載入中...</div>
     <div class="details" id="details">
