@@ -5,12 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的 IP 查詢</title>
-<link rel="stylesheet" href="style.css">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
      crossorigin="anonymous"></script>
 </head>
 <body>
-<div id="navContainer"></div>
 <div class="card">
     <h1>你的 IP 是</h1>
     <div class="ip-address" id="ip">載入中...</div>
@@ -24,9 +22,6 @@
 </div>
 
 <script>
-fetch('nav.html')
-  .then(res => res.text())
-  .then(html => document.getElementById('navContainer').innerHTML = html);
 async function fetchIP() {
     document.getElementById('ip').textContent = '載入中...';
     document.getElementById('details').innerHTML = `
