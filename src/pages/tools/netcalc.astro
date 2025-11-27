@@ -1,24 +1,22 @@
-// 確保路徑正確：myip.astro 在 src/pages/tools/，故需要 ..
+---
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 
-const title = '網段計算機'; const description = '網段計算機，提供快速查詢可用IP位址、子網遮罩與廣播地址。';
+const title = '網段計算機';
+const description = '網段計算機，提供快速查詢可用IP位址、子網遮罩與廣播地址。';
+---
 
 <!doctype html>
-
 <html lang="zh-Hant">
 <head>
-<!-- 這是您頁面的頭部資訊，包含了基礎樣式和 meta 標籤 -->
-<BaseHead title={title} description={SITE_DESCRIPTION} /> 
+    <BaseHead title={title} description={SITE_DESCRIPTION} />
 
-	<!-- 這裡放置 Google AdSense 腳本 (修正了 URL 中的 [] 符號) -->
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840" crossorigin="anonymous"></script>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840" crossorigin="anonymous"></script>
 
-    <!-- 專屬樣式開始 -->
     <style>
-        /* 基礎排版與容器設定 */
         main {
             max-width: 900px;
             margin: 2rem auto;
@@ -28,7 +26,7 @@ const title = '網段計算機'; const description = '網段計算機，提供�
             background: #ffffff;
             padding: 2.5rem;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,.1);
             border: 1px solid #e0e0e0;
             text-align: center;
         }
@@ -44,72 +42,60 @@ const title = '網段計算機'; const description = '網段計算機，提供�
             margin-bottom: 20px;
         }
         @media (min-width: 768px) {
-            .input-group {
-                flex-direction: row;
-            }
+            .input-group { flex-direction: row; }
         }
-
-        /* 輸入框樣式 */
         input[type="text"] {
             flex-grow: 1;
             padding: 12px;
             border: 2px solid #ccc;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: 0.3s;
             font-family: 'Inter', monospace;
         }
         input[type="text"]:focus {
             border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(0,123,255,.25);
             outline: none;
         }
-
-        /* 按鈕樣式 */
         button {
             padding: 12px 25px;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-weight: bold;
+            transition: 0.3s;
             width: 100%;
             margin-top: 10px;
-        }
-        button:active {
-            transform: translateY(1px);
+            font-weight: bold;
         }
         button[onclick="calculate()"] {
-            background-color: #007bff;
-            color: white;
+            background: #007bff;
+            color: #fff;
         }
         button[onclick="calculate()"]:hover {
-            background-color: #0056b3;
+            background: #0056b3;
         }
         .toggle-bin {
             display: inline-block;
             padding: 8px 15px;
-            background-color: #f1f1f1;
+            background: #f1f1f1;
             color: #555;
             border-radius: 6px;
             margin-top: 15px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: 0.3s;
             font-size: 0.9rem;
         }
         .toggle-bin:hover {
-            background-color: #e0e0e0;
+            background: #e0e0e0;
         }
-
-        /* 結果顯示區塊 */
         .results {
             margin-top: 25px;
             text-align: left;
             padding: 15px;
             border-radius: 8px;
-            background-color: #f8f9fa;
+            background: #f8f9fa;
             border: 1px dashed #ced4da;
         }
         .results > div {
@@ -119,201 +105,177 @@ const title = '網段計算機'; const description = '網段計算機，提供�
             justify-content: space-between;
             font-family: 'Inter', monospace;
         }
-        .results > div:last-child {
-            border-bottom: none;
-        }
+        .results > div:last-child { border-bottom: none; }
         .results strong {
+            width: 150px;
             font-weight: 600;
             color: #333;
-            width: 150px; /* 統一標籤寬度 */
-        }
-        .results span {
-            color: #007bff;
-            flex-grow: 1;
-            text-align: right;
         }
         .error-message {
             color: #dc3545;
             font-weight: bold;
-            text-align: center;
             padding: 10px;
+            text-align: center;
         }
     </style>
-    <!-- 專屬樣式結束 -->
 </head>
+
 <body>
-	<!-- 這裡放置 Header 元件，這是確保 Header 顯示的關鍵 -->
-	<Header /> 
-	
-	<!-- main 標籤應用置中樣式 -->
-	<main>
+    <Header />
+
+    <main>
         <div class="calculator-container">
             <h1>{title}</h1>
+
             <div class="input-group">
                 <input type="text" id="cidrInput" placeholder="IP/子網 (例: 192.168.1.10/24)">
                 <input type="text" id="maskInput" placeholder="子網遮罩 (例: 255.255.255.0)">
             </div>
-            
+
             <button onclick="calculate()">計算</button>
-            
             <div class="toggle-bin" id="toggleBinaryButton" onclick="toggleBinary()">切換二進位顯示</div>
-            
+
             <div class="results" id="results">
-                <!-- 預設提示 -->
-                <div style="justify-content: center; color: #6c757d; border-bottom: none;">請輸入 IP 地址開始計算</div>
+                <div style="justify-content:center;color:#6c757d;border-bottom:none;">
+                    請輸入 IP 地址開始計算
+                </div>
             </div>
-        </div>	
-	</main>
-	<Footer />
+        </div>
+    </main>
 
+    <Footer />
 
-        <script>
-// === 輔助函數：IP 轉換 ===
-
-        // IP 點分十進位陣列 轉 32 位元整數
-        function ipToInt(ipArr) {
-            // 使用 >>> 0 確保操作為無符號 32 位元整數
-            return (ipArr[0] >>> 0) * 256 * 256 * 256 + 
-                   (ipArr[1] >>> 0) * 256 * 256 + 
-                   (ipArr[2] >>> 0) * 256 + 
-                   (ipArr[3] >>> 0);
+    <script>
+        function ipToInt(ipArr){
+            return (ipArr[0]>>>0)*256*256*256 +
+                   (ipArr[1]>>>0)*256*256 +
+                   (ipArr[2]>>>0)*256 +
+                   (ipArr[3]>>>0);
         }
 
-        // 32 位元整數 轉 IP 點分十進位陣列
-        function intToIp(int) {
-            // 使用 >>> 確保結果是正數
+        function intToIp(int){
             return [
-                (int >>> 24) & 0xFF,
-                (int >>> 16) & 0xFF,
-                (int >>> 8) & 0xFF,
-                int & 0xFF
+                (int>>>24)&255,
+                (int>>>16)&255,
+                (int>>>8)&255,
+                int&255
             ];
         }
-        
-        // IP 點分十進位字串 轉 二進位字串
 
+        function ipToBinary(ip){
+            return ip.split('.').map(n => parseInt(n).toString(2).padStart(8,"0")).join('.');
+        }
 
-            function ipToBinary(ip){
-                return ip.split('.').map(n=>parseInt(n).toString(2).padStart(8,'0')).join('.');
-            }
+        function isPrivateIP(ip){
+            const [a,b] = ip.split('.').map(n => parseInt(n));
+            if(a===10) return "私有網段 (A 類)";
+            if(a===172 && b>=16 && b<=31) return "私有網段 (B 類)";
+            if(a===192 && b===168) return "私有網段 (C 類)";
+            if(a===127) return "迴圈本地 (Loopback)";
+            if(a>=224 && a<=239) return "多播地址 (Multicast)";
+            return "公網IP";
+        }
 
-        // 判斷 IP 類型
-
-
-            function isPrivateIP(ip){
-                const [a,b]=ip.split('.').map(n=>parseInt(n));
-                if(a===10) return "私有網段 (A 類)";
-                if(a===172 && b>=16 && b<=31) return "私有網段 (B 類)";
-                if(a===192 && b===168) return "私有網段 (C 類)";
-                if(a===127) return "迴圈本地 (Loopback)";
-if(a >= 224 && a <= 239) return "多播地址 (Multicast)";
-                return "公網IP";
-            }
-
-        // === 狀態與主程式 ===
         let showBinary = false;
 
+        function calculate(){
+            const cidrInput = document.getElementById('cidrInput').value.trim();
+            const maskVal = document.getElementById('maskInput').value.trim();
+            const results = document.getElementById('results');
 
-            function calculate(){
-                const cidrInput = document.getElementById('cidrInput').value.trim();
-                const maskVal = document.getElementById('maskInput').value.trim();
-                const results = document.getElementById('results');
+            let ip, mask, prefix;
 
-                let ip, mask, prefix;
+            if(cidrInput.includes('/')){
+                [ip, prefix] = cidrInput.split('/');
+                prefix = parseInt(prefix);
 
-                // 1. 解析輸入
-                if(cidrInput.includes('/')){
-                    [ip, prefix] = cidrInput.split('/');
-                    prefix = parseInt(prefix);
-               
+                mask = Array(4).fill(0).map((_,i)=>{
+                    let rem = prefix - i*8;
+                    if(rem>=8) return 255;
+                    if(rem<=0) return 0;
+                    return 256 - Math.pow(2, 8-rem);
+                }).join('.');
+            }
+            else if(cidrInput && maskVal){
+                ip = cidrInput;
+                mask = maskVal;
+                prefix = mask.split('.')
+                              .map(n => parseInt(n).toString(2).replace(/0/g,"").length)
+                              .reduce((a,b)=>a+b,0);
+            }
+            else {
+                results.innerHTML = `<div class="error-message">請輸入有效 IP 或 CIDR</div>`;
+                return;
+            }
 
-// 根據 prefix 計算 mask
-                    mask = Array(4).fill(0).map((_,i)=>{
-                        let rem = prefix - i*8;
-                        if(rem>=8) return 255;
-                        if(rem<=0) return 0;
-                        return 256 - Math.pow(2, 8-rem);
-                    }).join('.');
-                } else if(cidrInput && maskVal){
-                    ip = cidrInput;
-                    mask = maskVal;
-                    // 從 mask 計算 prefix
-                    prefix = mask.split('.').map(n=>parseInt(n).toString(2).split('1').length-1).reduce((a,b)=>a+b,0);
-                } else {
-                    results.innerHTML="<div class='error-message'>請輸入有效 IP 或 CIDR</div>";
-                    return;
-                }
+            const ipParts = ip.split('.').map(n => parseInt(n));
+            const maskParts = mask.split('.').map(n => parseInt(n));
 
-                // 格式檢查
-                const ipParts = ip.split('.').map(n=>parseInt(n));
-                const maskParts = mask.split('.').map(n=>parseInt(n));
-const isValidIp = ipParts.length === 4 && ipParts.every(n => !isNaN(n) && n >= 0 && n <= 255);
-const isValidMask = maskParts.length === 4 && maskParts.every(n => !isNaN(n) && n >= 0 && n <= 255);
-const isValidPrefix = prefix >= 0 && prefix <= 32;
+            if(ipParts.some(n=>isNaN(n)||n<0||n>255)
+            || maskParts.some(n=>isNaN(n)||n<0||n>255)
+            || prefix<0 || prefix>32){
+                results.innerHTML = `<div class="error-message">輸入格式錯誤 (IP 0–255, CIDR 0–32)</div>`;
+                return;
+            }
 
-                if(!isValidIp || !isValidMask || !isValidPrefix){
-                    results.innerHTML="<div class='error-message'>輸入格式錯誤 (IP 範圍 0-255，CIDR 範圍 0-32)</div>"; return;
-                }
+            const network = ipParts.map((n,i)=> n & maskParts[i]);
+            const wildcard = maskParts.map(n => (~n & 255));
+            const broadcast = network.map((n,i)=> n | wildcard[i]);
 
-            // 2. 核心運算：網路地址和廣播地址
-            // 使用位元 AND 運算計算網路地址
-
-
-                const network = ipParts.map((n,i)=> n & maskParts[i]);
-// 計算廣播地址 (網路地址 OR 反遮罩)
-const wildcard = maskParts.map(n => (~n & 255));
-                const broadcast = network.map((n,i)=> n | wildcard[i]);
-
-            // 3. 計算主機範圍和數量 (使用 32 位元整數更安全)
             const netInt = ipToInt(network);
-            const broadcastInt = ipToInt(broadcast);
-            
-            let hostMinInt, hostMaxInt;
-            let hostCount = Math.pow(2, 32 - prefix);
+            const bcInt  = ipToInt(broadcast);
 
-            if (prefix === 32) {
-                hostMinInt = netInt;
-                hostMaxInt = netInt;
+            let hostMinInt, hostMaxInt, hostCount = Math.pow(2, 32-prefix);
+
+            if(prefix === 32){
+                hostMinInt = hostMaxInt = netInt;
                 hostCount = 1;
-            } else if (prefix === 31) {
-                // /31 點對點，網路地址和廣播地址本身就是可用地址
+            } else if(prefix === 31){
                 hostMinInt = netInt;
-                hostMaxInt = broadcastInt;
+                hostMaxInt = bcInt;
                 hostCount = 2;
             } else {
-                // 標準網段：減去網路地址和廣播地址
                 hostMinInt = netInt + 1;
-                hostMaxInt = broadcastInt - 1;
+                hostMaxInt = bcInt - 1;
                 hostCount -= 2;
             }
-            
+
             const hostMin = intToIp(hostMinInt);
             const hostMax = intToIp(hostMaxInt);
 
-
-                // 格式化顯示結果
-                function display(ipArr){
-                    const ipStr = ipArr.join('.');
-                    return showBinary ? ipToBinary(ipStr) +  (${ipStr}) : ipStr;
-                }
-
-            function displayMask(maskStr){
-                return showBinary ? ipToBinary(maskStr) + ` (${maskStr})` : maskStr;
+            function display(arr){
+                const s = arr.join('.');
+                return showBinary ? `${ipToBinary(s)} (${s})` : s;
             }
 
+            function displayMask(m){
+                return showBinary ? `${ipToBinary(m)} (${m})` : m;
+            }
 
-                results.innerHTML =                 <div><strong>輸入 IP:</strong><span>${display(ipParts)}</span></div>                 <div><strong>子網遮罩 (Mask):</strong><span>${displayMask(mask)}</span></div>                 <div><strong>子網位元 (CIDR):</strong><span>/${prefix}</span></div>                 <div><strong>IP 類型:</strong><span>${isPrivateIP(ip)}</span></div> <div style="margin-top: 10px; border-top: 2px solid #ddd;"><strong>網段位址 (Network ID):</strong><span>${display(network)}</span></div>                 <div><strong>廣播位址 (Broadcast):</strong><span>${display(broadcast)}</span></div>                 <div><strong>可用主機範圍:</strong><span>${display(hostMin)} - ${display(hostMax)}</span></div>                 <div><strong>可用主機數量:</strong><span>${hostCount}</span></div>            ;
-            }
+            results.innerHTML = `
+                <div><strong>輸入 IP:</strong><span>${display(ipParts)}</span></div>
+                <div><strong>子網遮罩 (Mask):</strong><span>${displayMask(mask)}</span></div>
+                <div><strong>子網位元 (CIDR):</strong><span>/${prefix}</span></div>
+                <div><strong>IP 類型:</strong><span>${isPrivateIP(ip)}</span></div>
 
-        // 切換二進位顯示
+                <div style="margin-top:10px;border-top:2px solid #ddd;">
+                    <strong>網段位址 (Network ID):</strong>
+                    <span>${display(network)}</span>
+                </div>
 
+                <div><strong>廣播位址 (Broadcast):</strong><span>${display(broadcast)}</span></div>
+                <div><strong>可用主機範圍:</strong><span>${display(hostMin)} - ${display(hostMax)}</span></div>
+                <div><strong>可用主機數量:</strong><span>${hostCount}</span></div>
+            `;
+        }
 
-            function toggleBinary(){
-                showBinary = !showBinary;
-document.getElementById('toggleBinaryButton').textContent = showBinary ? '切換為十進位顯示' : '切換二進位顯示';
-                calculate();
-            }
-</script>
+        function toggleBinary(){
+            showBinary = !showBinary;
+            document.getElementById('toggleBinaryButton').textContent =
+                showBinary ? "切換為十進位顯示" : "切換二進位顯示";
+
+            calculate();
+        }
+    </script>
 </body>
-
 </html>
