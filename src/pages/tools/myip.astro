@@ -116,60 +116,41 @@ const description = '快速查詢您的公開 IP 地址及地理位置資訊。'
 		
 		<!-- 這裡放置 Footer 元件，這是確保 Footer 顯示的關鍵 -->
 		<Footer /> 
-		
+	<script>	
 		<!-- JavaScript 邏輯 -->
-		<script>
-            // IP Info 授權金鑰
-			const IP_INFO_TOKEN = '1b172809b09566'; 
+	async function fetchIP() {
+    	document.getElementById('ip').textContent = '載入中...';
+    	document.getElementById('details').innerHTML = `
+       		<div class="detail-box">國家：載入中</div>
+			<div class="detail-box">城市：載入中</div>
+			<div class="detail-box">ISP：載入中</div>
+			<div class="detail-box">時區：載入中</div>
+    	`;
+    try {
+        // 先取得 IP
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        const ip = ipData.ip;
+        document.getElementById('ip').textContent = ip;
 
-			async function fetchIP() {
-				const ipDisplay = document.getElementById('ip');
-				const detailsDisplay = document.getElementById('details');
+        // 再取得詳細資訊
+        const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
+        const infoData = await infoRes.json();
 
-				// 使用標準字串，避免編譯錯誤
-				ipDisplay.textContent = '載入中...';
-				detailsDisplay.innerHTML = 
-					'<div class="detail-box">國家：載入中</div>' +
-					'<div class="detail-box">城市：載入中</div>' +
-					'<div class="detail-box">ISP：載入中</div>' +
-					'<div class="detail-box">時區：載入中</div>';
-				
-				try {
-					// 1. 取得 IP
-					const ipRes = await fetch('[https://api.ipify.org?format=json](https://api.ipify.org?format=json)');
-					const ipData = await ipRes.json();
-					const ip = ipData.ip;
-					ipDisplay.textContent = ip;
-
-					// 2. 取得詳細資訊 (修正 fetch URL 語法)
-					const infoUrl = '[https://ipinfo.io/](https://ipinfo.io/)' + ip + '/json?token=' + IP_INFO_TOKEN;
-					const infoRes = await fetch(infoUrl);
-					const infoData = await infoRes.json();
-                    
-                    const country = infoData.country || 'N/A';
-                    const city = infoData.city || 'N/A';
-                    const org = infoData.org || 'N/A';
-                    const timezone = infoData.timezone || 'N/A';
-
-					// 修正 HTML 注入語法
-					detailsDisplay.innerHTML = 
-						'<div class="detail-box">國家：' + country + '</div>' +
-						'<div class="detail-box">城市：' + city + '</div>' +
-						'<div class="detail-box">ISP：' + org + '</div>' +
-						'<div class="detail-box">時區：' + timezone + '</div>';
-                        
-				} catch (error) {
-					console.error("IP 查詢失敗:", error);
-					ipDisplay.textContent = '無法取得 IP';
-					detailsDisplay.innerHTML = '<div class="detail-box">連線錯誤，請稍後再試。</div>';
-				}
-			}
-            
-            // 確保在頁面載入後執行查詢
-            document.addEventListener('astro:load', fetchIP);
-            if (!document.documentElement.hasAttribute('data-astro-transitions')) {
-                fetchIP();
-            }
+        document.getElementById('details').innerHTML = `
+            <div class="detail-box">國家：${infoData.country || '-'}</div>
+            <div class="detail-box">城市：${infoData.city || '-'}</div>
+            <div class="detail-box">ISP：${infoData.org || '-'}</div>
+            <div class="detail-box">時區：${infoData.timezone || '-'}</div>
+        `;
+    } catch (error) {
+        document.getElementById('ip').textContent = '無法取得 IP';
+        document.getElementById('details').innerHTML = `
+            <div class="detail-box">請稍後再試</div>
+        `;
+    }
+}
+fetchIP();
 		</script>
 	</body>
 </html>
