@@ -4,122 +4,203 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 
 const title = 'IP 查詢工具';
-const description = '查詢你的公開 IP 與地理位置。';
+const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格）';
 ---
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
   <head>
     <BaseHead title={title} description={description} />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
 
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-      .ip-container {
-        max-width: 780px;
-        margin: 40px auto;
-        padding: 1.5rem;
+      /* Cloudflare-like theme variables */
+      :root{
+        --bg: #0f1724;         /* deep navy */
+        --panel: #0b1220;      /* panel dark */
+        --muted: #94a3b8;
+        --accent: #2563eb;     /* blue */
+        --glass: rgba(255,255,255,0.03);
+        --card-radius: 12px;
+        --gap: 16px;
       }
 
-      .ip-card {
-        background: #fff;
-        padding: 2rem;
-        border-radius: 18px;
-        box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-        text-align: center;
+      /* page */
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        background: linear-gradient(180deg,#071021 0%, #0b1220 100%);
+        color: #e6eef8;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
       }
 
-      .ip-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 10px;
+      main.container {
+        max-width: 1100px;
+        margin: 36px auto;
+        padding: 24px;
       }
 
-      .ip-address {
-        font-size: 2.3rem;
-        font-weight: 900;
-        color: #2563eb;
-        background: #eef4ff;
-        padding: 10px 20px;
-        border-radius: 12px;
-        display: inline-block;
-        margin-bottom: 25px;
-        word-break: break-all;
-      }
-
-      .info-grid {
+      /* top card */
+      .top-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border: 1px solid rgba(255,255,255,0.04);
+        border-radius: var(--card-radius);
+        padding: 22px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 15px;
-        margin-bottom: 25px;
-        text-align: left;
+        grid-template-columns: 1fr 420px;
+        gap: var(--gap);
+        align-items: start;
+        box-shadow: 0 6px 30px rgba(2,6,23,0.6);
       }
 
-      .info-box {
-        background: #eef4ff;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        border: 1px solid #e3ebf5;
+      /* fallback to single column on small screens */
+      @media (max-width: 880px) {
+        .top-card { grid-template-columns: 1fr; }
       }
 
-      .info-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #55637a;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      .left {
+        padding-right: 6px;
       }
 
-      .info-value {
-        font-size: 1.1rem;
+      .title {
+        font-size: 1.25rem;
         font-weight: 700;
-        color: #1c2a3a;
+        color: #f8fafc;
+        margin-bottom: 6px;
+      }
+      .desc {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 14px;
+      }
+
+      .ip-box {
+        display:flex;
+        gap:12px;
+        align-items:center;
+        background: var(--glass);
+        border-radius: 10px;
+        padding: 10px 14px;
+        border: 1px solid rgba(255,255,255,0.03);
+        margin-bottom: 12px;
+      }
+
+      .ip-text {
+        font-weight:800;
+        font-size:1.6rem;
+        letter-spacing: 0.6px;
+        color: #dbeafe;
+        word-break:break-all;
+      }
+
+      .actions {
+        margin-left:auto;
+        display:flex;
+        gap:8px;
+        align-items:center;
+      }
+
+      .btn {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.04);
+        color: var(--muted);
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor:pointer;
+        font-weight:600;
+        font-size:0.88rem;
+      }
+      .btn.primary {
+        background: linear-gradient(90deg,var(--accent), #1e40af);
+        border: none;
+        color: white;
+      }
+      .btn:hover { transform: translateY(-1px); }
+
+      /* right panel: map & summary */
+      .right {
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      #map {
+        height: 280px;
+        border-radius: 10px;
+        overflow:hidden;
+        border: 1px solid rgba(255,255,255,0.04);
+        box-shadow: 0 6px 18px rgba(2,6,23,0.6) inset;
+      }
+
+      .summary {
+        display:flex;
+        gap:8px;
+        align-items:center;
+        justify-content:space-between;
+        color:var(--muted);
+        font-size:0.9rem;
+      }
+
+      /* info grid (under top card) */
+      .info-grid {
+        margin-top: 20px;
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      @media (max-width: 980px) {
+        .info-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 640px) {
+        .info-grid { grid-template-columns: 1fr; }
+      }
+
+      .info-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius: 10px;
+        padding: 14px;
+        border: 1px solid rgba(255,255,255,0.03);
+        min-height: 84px;
+      }
+
+      .label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight:600;
+        display:flex;
+        align-items:center;
+        gap:8px;
+      }
+      .value {
+        margin-top:8px;
+        font-weight:700;
+        font-size:1.05rem;
+        color:#e6f0ff;
         word-break: break-all;
       }
 
       .flag {
-        font-size: 1.3rem;
+        font-size:1.25rem;
+        margin-left:6px;
       }
 
-      #map {
-        height: 350px;
-        width: 100%;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-top: 25px;
+      /* small helper text */
+      .meta {
+        font-size:0.85rem;
+        color:var(--muted);
+        margin-top:12px;
       }
 
-      .reload-btn {
-        margin-top: 25px;
-        padding: 12px 32px;
-        background: #2563eb;
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-size: 1rem;
-        cursor: pointer;
-      }
-
-      .reload-btn:hover {
-        background: #1e40af;
-      }
-
-      .data-source {
-        margin-top: 30px;
-        text-align: center;
+      /* subtle footer for source */
+      .source {
+        margin-top: 18px;
+        color: var(--muted);
         font-size: 0.85rem;
-        color: #475569;
-      }
-
-      @media (max-width: 480px) {
-        .ip-address {
-          font-size: 1.8rem;
-        }
       }
     </style>
   </head>
@@ -127,114 +208,236 @@ const description = '查詢你的公開 IP 與地理位置。';
   <body>
     <Header />
 
-    <main class="ip-container">
-      <div class="ip-card">
-        <div class="ip-title">公開 IP 位址 (IPv4)</div>
-        <div id="ip" class="ip-address">載入中...</div>
+    <main class="container">
+      <div class="top-card" role="region" aria-label="IP 查詢總覽">
+        <div class="left">
+          <div class="title">公開 IP 與地理位置</div>
+          <div class="desc">自動偵測你的公開 IPv4 並顯示 ISP、城市、國家、時區與地圖定位 — Cloudflare 風格外觀。</div>
 
-        <div id="info" class="info-grid"></div>
-        <div id="map"></div>
+          <div class="ip-box" aria-live="polite">
+            <div>
+              <div style="font-size:0.78rem;color:var(--muted);font-weight:700;">公開 IP (IPv4)</div>
+              <div id="ip" class="ip-text">載入中...</div>
+            </div>
+
+            <div class="actions" role="toolbar" aria-label="操作">
+              <button id="copyBtn" class="btn" title="複製 IP">Copy</button>
+              <button id="refreshBtn" class="btn" title="重新整理">Refresh</button>
+              <button id="openMapBtn" class="btn primary" title="在地圖中定位">在地圖定位</button>
+            </div>
+          </div>
+
+          <div class="meta" id="metaLine">ISP · 城市 · 國家 · 時區 · 座標</div>
+        </div>
+
+        <div class="right">
+          <div id="map" aria-hidden="false"></div>
+          <div class="summary" id="mapSummary">
+            <div id="cityCountry">—</div>
+            <div id="tz">—</div>
+          </div>
+        </div>
       </div>
 
-      <button id="reload" class="reload-btn">重新整理</button>
-
-      <div class="data-source">
-        數據來源：ipify、IPinfo、OpenStreetMap
+      <!-- info cards -->
+      <div class="info-grid" id="infoGrid" aria-live="polite">
+        <!-- cards will be injected here -->
       </div>
+
+      <div class="source">資料來源：ipify（IP） • ipapi.co（地理/ISP） • OpenStreetMap（地圖）</div>
     </main>
 
     <Footer />
 
     <script>
-      const IPINFO_TOKEN = "1b172809b09566"; // ← 你自己的 token
-
-      function toFlag(country) {
-        if (!country) return "❓";
-        return country.toUpperCase().replace(/./g, c =>
-          String.fromCodePoint(c.charCodeAt(0) + 127397)
-        );
+      // util: country code to flag emoji (safe if valid code)
+      function countryToFlag(cc) {
+        if (!cc) return '❓';
+        try {
+          return cc.toUpperCase().replace(/./g, char =>
+            String.fromCodePoint(char.charCodeAt(0) + 127397)
+          );
+        } catch(e) {
+          return '❓';
+        }
       }
 
-      let mapInstance = null;
+      // DOM refs
+      const ipEl = document.getElementById('ip');
+      const infoGrid = document.getElementById('infoGrid');
+      const metaLine = document.getElementById('metaLine');
+      const cityCountryEl = document.getElementById('cityCountry');
+      const tzEl = document.getElementById('tz');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const copyBtn = document.getElementById('copyBtn');
+      const openMapBtn = document.getElementById('openMapBtn');
 
-      async function loadIP() {
-        const ipEl = document.getElementById("ip");
-        const infoEl = document.getElementById("info");
+      let map = null;
+      let current = null; // store current geo object
 
-        ipEl.textContent = "載入中...";
-        infoEl.innerHTML = "";
-
-        // 移除舊地圖
-        if (mapInstance) {
-          mapInstance.remove();
-          mapInstance = null;
-        }
-
+      async function fetchPublicIP(){
         try {
-          // 取得 IP
-          const ipData = await fetch("https://api.ipify.org?format=json");
-          const { ip } = await ipData.json();
+          const r = await fetch('https://api.ipify.org?format=json');
+          const j = await r.json();
+          return j.ip;
+        } catch(e){
+          console.error('ip error', e);
+          throw new Error('無法取得公開 IP');
+        }
+      }
+
+      async function fetchGeo(ip){
+        // using ipapi.co: returns latitude, longitude, org, city, country, country_name, timezone
+        try {
+          const r = await fetch(`https://ipapi.co/${ip}/json/`);
+          const j = await r.json();
+          // ipapi may return an "error" field
+          if (j.error) throw new Error(j.reason || 'geo error');
+          return j;
+        } catch(e){
+          console.error('geo error', e);
+          throw new Error('無法取得地理資訊');
+        }
+      }
+
+      // build the info cards to match your requested fields (Cloudflare style)
+      function renderInfo(data){
+        infoGrid.innerHTML = '';
+
+        const items = [
+          { key: 'public', label: 'public\ n公開 IP 位址 (IPv4)', value: data.ip }, // label will be formatted below
+          { key: 'business', label: '服務提供者 (ISP)', value: data.org || data.network || 'N/A' },
+          { key: 'location_city', label: '城市 / 區域', value: data.city || 'N/A' },
+          { key: 'flag', label: '國家 / 代碼', value: `${data.country_name || ''} / ${data.country || ''}` , flag: countryToFlag(data.country) },
+          { key: 'schedule', label: '時區', value: data.timezone || 'N/A' },
+          { key: 'my_location', label: '位置座標 (經度, 緯度)', value: `${data.longitude || '0'}, ${data.latitude || '0'}` },
+        ];
+
+        // small helper to format the first label (we want the english tag on top)
+        items.forEach(it => {
+          const card = document.createElement('div');
+          card.className = 'info-card';
+
+          // label area (we place a small "icon-like" tag + chinese)
+          const lbl = document.createElement('div');
+          lbl.className = 'label';
+          // map some english-like icons/keywords for the 'left small tag' (Cloudflare aesthetic)
+          if (it.key === 'public') {
+            lbl.innerHTML = '<strong style="color:#cfe4ff;font-weight:800;margin-right:8px;">public</strong>' + it.label.split('\\n')[1] || '公開 IP';
+          } else if (it.key === 'business') {
+            lbl.innerHTML = '<strong style="color:#ffd6a5;margin-right:8px;font-weight:700;">business</strong>' + it.label;
+          } else if (it.key === 'location_city') {
+            lbl.innerHTML = '<strong style="color:#c7f9cc;margin-right:8px;font-weight:700;">location_city</strong>' + it.label;
+          } else if (it.key === 'flag') {
+            lbl.innerHTML = '<strong style="color:#ffb4c1;margin-right:8px;font-weight:700;">flag</strong>' + it.label;
+          } else if (it.key === 'schedule') {
+            lbl.innerHTML = '<strong style="color:#dbeafe;margin-right:8px;font-weight:700;">schedule</strong>' + it.label;
+          } else if (it.key === 'my_location') {
+            lbl.innerHTML = '<strong style="color:#ffe8a3;margin-right:8px;font-weight:700;">my_location</strong>' + it.label;
+          } else {
+            lbl.textContent = it.label;
+          }
+
+          const val = document.createElement('div');
+          val.className = 'value';
+          // include flag emoji when appropriate
+          if (it.flag) {
+            val.innerHTML = `<span>${it.value}</span> <span class="flag">${it.flag}</span>`;
+          } else {
+            val.textContent = it.value;
+          }
+
+          card.appendChild(lbl);
+          card.appendChild(val);
+          infoGrid.appendChild(card);
+        });
+      }
+
+      // init map
+      function initMap(lat, lon, popupText){
+        try {
+          if (map) map.remove();
+          map = L.map('map', { zoomControl: true }).setView([lat, lon], 10);
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19,
+          }).addTo(map);
+
+          L.marker([lat, lon]).addTo(map).bindPopup(popupText || '').openPopup();
+        } catch(e) {
+          console.error('map error', e);
+        }
+      }
+
+      // main loader
+      async function loadAll(){
+        try {
+          ipEl.textContent = '載入中...';
+          metaLine.textContent = '讀取中...';
+          infoGrid.innerHTML = '';
+
+          const ip = await fetchPublicIP();
+
+          // show basic ip first
           ipEl.textContent = ip;
 
-          // 取得地理資訊
-          const infoData = await fetch(`https://ipinfo.io/${ip}/json?token=${IPINFO_TOKEN}`);
-          const info = await infoData.json();
+          const geo = await fetchGeo(ip);
+          // geo contains e.g. latitude, longitude, org, city, country, country_name, timezone
+          current = Object.assign({ ip }, geo);
 
-          const [lat, lon] = info.loc.split(",");
+          // render UI
+          renderInfo(current);
 
-          const items = [
-            { label: "服務提供者 (ISP)", value: info.org || "未知" },
-            { label: "城市 / 區域", value: info.city || "未知" },
-            { label: "國家 / 代碼", value: `${info.country || "未知"} `, flag: toFlag(info.country) },
-            { label: "時區", value: info.timezone || "未知" },
-            { label: "位置座標 (經度, 緯度)", value: `${lon}, ${lat}` },
-          ];
+          // meta line
+          metaLine.textContent = `${current.org || '未知 ISP'} · ${current.city || '未知城市'} · ${current.country || ''} · ${current.timezone || ''} · ${current.longitude || '0'}, ${current.latitude || '0'}`;
 
-          items.forEach(i => {
-            const box = document.createElement("div");
-            box.className = "info-box";
+          cityCountryEl.textContent = `${current.city || '—'} · ${current.country_name || current.country || '—'}`;
+          tzEl.textContent = current.timezone || '—';
 
-            const label = document.createElement("div");
-            label.className = "info-label";
-            label.textContent = i.label;
+          // map center
+          const lat = parseFloat(current.latitude) || 0;
+          const lon = parseFloat(current.longitude) || 0;
+          initMap(lat, lon, `${current.city || ''} · ${current.country || ''}`);
 
-            if (i.flag) {
-              const f = document.createElement("span");
-              f.className = "flag";
-              f.textContent = i.flag;
-              label.appendChild(f);
-            }
-
-            const value = document.createElement("div");
-            value.className = "info-value";
-            value.textContent = i.value;
-
-            box.appendChild(label);
-            box.appendChild(value);
-            infoEl.appendChild(box);
-          });
-
-          // 地圖
-          mapInstance = L.map("map").setView([lat, lon], 10);
-
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-          }).addTo(mapInstance);
-
-          L.marker([lat, lon])
-            .addTo(mapInstance)
-            .bindPopup(`${info.city || '未知'}, ${info.country || ''}`)
-            .openPopup();
-
-        } catch (e) {
-          ipEl.textContent = "載入失敗";
-          infoEl.innerHTML =
-            "<div style='grid-column:1/-1;text-align:center;padding:20px;'>無法取得 IP 資訊</div>";
+        } catch (err) {
+          ipEl.textContent = '載入失敗';
+          infoGrid.innerHTML = '<div class="info-card"><div class="label">錯誤</div><div class="value">無法取得 IP 或地理資訊，請稍後再試。</div></div>';
+          metaLine.textContent = '取得資料錯誤';
+          console.error(err);
         }
       }
 
-      document.getElementById("reload").onclick = loadIP;
-      loadIP();
+      // copy IP
+      copyBtn.addEventListener('click', async () => {
+        if (!current || !current.ip) return;
+        try {
+          await navigator.clipboard.writeText(current.ip);
+          copyBtn.textContent = '已複製';
+          setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
+        } catch(e){
+          copyBtn.textContent = '複製失敗';
+          setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
+        }
+      });
+
+      // refresh
+      refreshBtn.addEventListener('click', () => {
+        loadAll();
+      });
+
+      openMapBtn.addEventListener('click', () => {
+        if (!current) return;
+        const lat = parseFloat(current.latitude) || 0;
+        const lon = parseFloat(current.longitude) || 0;
+        if (!map) initMap(lat, lon, `${current.city || ''} · ${current.country || ''}`);
+        map.setView([lat, lon], 11);
+      });
+
+      // load on ready
+      window.addEventListener('DOMContentLoaded', () => {
+        loadAll();
+      });
     </script>
   </body>
 </html>
