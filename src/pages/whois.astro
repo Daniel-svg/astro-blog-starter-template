@@ -34,6 +34,13 @@ const description = '查詢公開 IP、ISP 與地理位置';
         margin-bottom: 16px;
       }
 
+      .source {
+        text-align: center;
+        color: #6b7280;
+        margin-top: 12px;
+        font-size: 0.9rem;
+      }
+
       #ip-form {
         display: flex;
         gap: 12px;
@@ -120,6 +127,9 @@ const description = '查詢公開 IP、ISP 與地理位置';
         <div class="title">地理位置</div>
         <iframe id="map"></iframe>
       </div>
+
+      <p class="source">資料來源：InterNIC WHOIS</p>
+
     </main>
     <Footer />
 
