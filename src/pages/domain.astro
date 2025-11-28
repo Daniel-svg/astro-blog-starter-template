@@ -13,29 +13,16 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
     <BaseHead title={title} description={description} />
 
     <style>
-      body {
-        background: var(--bg);
-        margin: 0;
-        font-family: Inter, system-ui, sans-serif;
-      }
-
       main.container {
         width: min(100% - 2rem, 860px);
         margin: 40px auto;
       }
       .source {
-         text-align: center !important;
+        text-align: center;
+        color: #6b7280;
+        margin-top: 12px;
+        font-size: 0.9rem;
       }
-      .card {
-        background: var(--panel);
-        padding: 26px;
-        border-radius: var(--card-radius);
-        border: 1px solid var(--border);
-        width: 100%;             /* ⭐ 確保永遠不超過螢幕 */
-        box-sizing: border-box;  /* ⭐ padding 不會把卡片撐爆 */
-      }
-
-
       h1 {
         margin: 0 0 14px;
         font-size: 1.6rem;
@@ -131,6 +118,11 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         font-size: 1.6rem;
         font-weight: bold;
         margin-bottom: 16px;
+      }
+      .desc {
+        font-size: 1rem;
+        color: #6b7280;
+        margin-bottom: 18px;
       }
     </style>
   </head>
