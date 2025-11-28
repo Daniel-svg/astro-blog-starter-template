@@ -9,245 +9,211 @@ const title = '我的 IP 查詢工具';
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-	<BaseHead title={title} />
-	
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <BaseHead title={title} />
 
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			background: #f5f7fb;
-			font-family: "Inter", system-ui, sans-serif;
-			color: #1f2d3d;
-		}
+  <!-- Leaflet 地圖套件 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-		.main-container {
-			max-width: 800px;
-			margin: 40px auto;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 20px;
-			padding: 1.5em;
-		}
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+      font-family: "Inter", system-ui, sans-serif;
+      color: #1f2d3d;
+      text-align: center;
+    }
 
-		.card {
-			background: white;
-			padding: 30px;
-			border-radius: 18px;
-			box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-			width: 100%;
-			text-align: center;
-		}
+    .main-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 1.5em;
+    }
 
-		.ip-title {
-			font-size: 1.4rem;
-			color: #3a475d;
-			margin-bottom: 12px;
-			font-weight: 600;
-		}
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
 
-		.ip-address {
-			font-size: 2.5rem;
-			font-weight: 800;
-			color: #2563eb;
-			background: #eef4ff;
-			padding: 10px 20px;
-			border-radius: 12px;
-			display: inline-block;
-			margin-bottom: 20px;
-		}
+    .ip-title {
+      font-size: 1.4rem;
+      color: #3a475d;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
 
-		.info-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-			gap: 15px;
-			margin-top: 20px;
-		}
+    .ip-address {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #2563eb;
+      background: #eef4ff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
 
-		.info-box {
-			background: #f0f4fa;
-			padding: 12px 16px;
-			border-radius: 12px;
-			box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-			text-align: center;
-		}
+    /* 資訊卡片 */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 20px;
+      text-align: left;
+    }
 
-		.info-label {
-			font-size: .8rem;
-			font-weight: 600;
-			color: #55637a;
-			text-transform: uppercase;
-			margin-bottom: 4px;
-			display: block;
-		}
+    .info-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
 
-		.info-label-flag {
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			justify-content: center;
-		}
+    .info-box:nth-child(odd) {
+      background: #f0f4fa;
+    }
 
-		.flag {
-			font-size: 1.5rem;
-			vertical-align: middle;
-		}
+    .info-box:nth-child(even) {
+      background: #ffffff;
+    }
 
-		.info-value {
-			font-size: 1rem;
-			font-weight: 500;
-			color: #1c2a3a;
-			padding: 6px 0;
-			border-top: 1px solid #dce0eb;
-			margin-top: 4px;
-		}
+    .info-label {
+      font-weight: 600;
+      color: #55637a;
+      text-transform: uppercase;
+    }
 
-		#map {
-			width: 100%;
-			height: 300px;
-			margin-top: 20px;
-			border-radius: 14px;
-			overflow: hidden;
-		}
+    .info-value {
+      font-weight: 500;
+      color: #1c2a3a;
+      text-align: right;
+      word-break: break-word;
+    }
 
-		.reload-btn {
-			margin-top: 20px;
-			padding: 10px 28px;
-			background: #2563eb;
-			color: white;
-			border: none;
-			border-radius: 10px;
-			font-size: .95rem;
-			cursor: pointer;
-			width: 100%;
-			max-width: 200px;
-			text-align: center;
-		}
+    .flag {
+      margin-left: 6px;
+    }
 
-		.data-source {
-			text-align: center;
-			font-size: .85rem;
-			color: #55637a;
-			margin-top: 10px;
-		}
+    #map {
+      width: 100%;
+      height: 350px;
+      margin-top: 25px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
 
-		.data-source a {
-			color: #2563eb;
-			text-decoration: none;
-		}
-	</style>
+    .reload-btn {
+      margin-top: 25px;
+      padding: 12px 32px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .data-source {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #55637a;
+      line-height: 1.4;
+    }
+
+    .data-source a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .data-source a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 
 <body>
-	<Header />
+  <Header />
 
-	<main class="main-container">
+  <main class="main-container">
+    <div class="card">
+      <div class="ip-title">你的公開 IP 地址</div>
+      <div class="ip-address" id="ip">載入中...</div>
 
-		<div class="card">
-			<div class="ip-title">你的公開 IP 地址</div>
-			<div class="ip-address" id="ip">載入中...</div>
+      <div class="info-grid" id="details"></div>
 
-			<div class="info-grid" id="details"></div>
+      <div id="map"></div>
+    </div>
 
-			<div id="map"></div>
-		</div>
+    <button class="reload-btn" id="reload">重新整理</button>
 
-		<button class="reload-btn" id="reload">重新整理</button>
+    <div class="data-source">
+      <p>數據來源：</p>
+      <p>
+        公開 IP 查詢由 
+        <a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
+        提供；地理位置資訊由 
+        <a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
+        提供。
+      </p>    
+    </div>
+  </main>
 
-		<div class="data-source">
-			<p>數據來源：</p>
-			<p>
-				公開 IP 查詢由 
-				<a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
-				提供；地理位置資訊由 
-				<a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
-				提供。
-			</p>		
-		</div>
-	</main>
+  <Footer />
 
-	<Footer />
+  <script>
+    // 國家代碼轉 Unicode 國旗
+    function countryToFlag(countryCode) {
+      if (!countryCode) return "❓";
+      return countryCode
+        .toUpperCase()
+        .replace(/./g, char => 
+          String.fromCodePoint(char.charCodeAt(0) + 127397)
+        );
+    }
 
-<script>
-function countryToFlag(countryCode) {
-	if (!countryCode) return "❓";
-	return countryCode
-		.toUpperCase()
-		.replace(/./g, char => 
-			String.fromCodePoint(char.charCodeAt(0) + 127397)
-		);
-}
+    async function fetchIP() {
+      document.getElementById('ip').textContent = '載入中...';
 
-async function fetchIP() {
-	document.getElementById('ip').textContent = '載入中...';
+      const ipRes = await fetch('https://api.ipify.org?format=json');
+      const { ip } = await ipRes.json();
+      document.getElementById('ip').textContent = ip;
 
-	const ipRes = await fetch('https://api.ipify.org?format=json');
-	const { ip } = await ipRes.json();
+      const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
+      const info = await infoRes.json();
 
-	document.getElementById('ip').textContent = ip;
+      // 資訊卡片
+      document.getElementById('details').innerHTML = `
+        <div class="info-box">
+          <div class="info-label">Country <span class="flag">${countryToFlag(info.country)}</span></div>
+          <div class="info-value">${info.country}</div>
+        </div>
+        <div class="info-box"><div class="info-label">City</div><div class="info-value">${info.city}</div></div>
+        <div class="info-box"><div class="info-label">Region</div><div class="info-value">${info.region}</div></div>
+        <div class="info-box"><div class="info-label">ISP</div><div class="info-value">${info.org}</div></div>
+        <div class="info-box"><div class="info-label">GPS</div><div class="info-value">${info.loc ? info.loc.replace(',', ', ') : '0, 0'}</div></div>
+        <div class="info-box"><div class="info-label">VPN / Proxy</div><div class="info-value">
+          ${info.privacy?.vpn ? '✔ VPN' : '❌ No'}
+        </div></div>
+      `;
 
-	const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
-	const info = await infoRes.json();
+      // 經緯度
+      let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
 
-	document.getElementById('details').innerHTML = `
-		<div class="info-box">
-			<div class="info-label info-label-flag">
-				Country <span class="flag">${countryToFlag(info.country)}</span>
-			</div>
-			<div class="info-value">${info.country}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">City</div>
-			<div class="info-value">${info.city}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">Region</div>
-			<div class="info-value">${info.region}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">ISP</div>
-			<div class="info-value">${info.org}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">ASN</div>
-			<div class="info-value">${info.org?.split(" ")[0] || '-'}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">GPS</div>
-			<div class="info-value">${info.loc ? info.loc.replace(',', ', ') : '0, 0'}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">Timezone</div>
-			<div class="info-value">${info.timezone}</div>
-		</div>
-		<div class="info-box">
-			<div class="info-label">VPN / Proxy</div>
-			<div class="info-value">
-				${info.privacy?.vpn ? '✔ VPN' : '❌ No'}
-			</div>
-		</div>
-	`;
+      // Leaflet 地圖
+      let map = L.map('map').setView([lat, lon], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+      L.marker([lat, lon]).addTo(map)
+        .bindPopup(`${info.city}, ${info.country}`)
+        .openPopup();
+    }
 
-	let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
-
-	let map = L.map('map').setView([lat, lon], 10);
-
-	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-	}).addTo(map);
-
-	L.marker([lat, lon]).addTo(map)
-		.bindPopup(`${info.city}, ${info.country}`)
-		.openPopup();
-}
-
-document.getElementById("reload").onclick = fetchIP;
-
-fetchIP();
-</script>
-
+    document.getElementById("reload").onclick = fetchIP;
+    fetchIP();
+  </script>
 </body>
 </html>
