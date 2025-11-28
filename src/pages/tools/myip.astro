@@ -191,13 +191,15 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
 
         const infoList = [
           { label: '國家/地區', value: info.country || 'N/A', flag: countryToFlag(info.country) },
-          { label: '城市', value: info.city || 'N/A' },
-          { label: '區域/州', value: info.region || 'N/A' },
-          { label: '郵遞區號', value: info.postal || 'N/A' },
-          { label: '網路供應商 (ISP)', value: info.org || 'N/A' },
-          { label: 'GPS 座標', value: info.loc ? info.loc.replace(',', ', ') : '0, 0' },
+          { label: '城市 / 區域', value: info.city || 'N/A' },
+          { label: '服務提供者 (ISP)', value: info.org || 'N/A' },
           { label: '時區', value: info.timezone || 'N/A' },
+          {
+            label: '位置座標 (經度, 緯度)',
+            value: info.loc ? info.loc.split(",").reverse().join(", ") : '0, 0'
+          },
         ];
+
 
         infoList.forEach(item => {
           const box = document.createElement('div');
