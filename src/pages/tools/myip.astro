@@ -57,12 +57,6 @@ const title = '我的 IP 查詢工具';
 			display: inline-block;
 		}
 
-		.flag {
-			font-size: 2.6rem;
-			margin-left: 10px;
-			vertical-align: middle;
-		}
-
 		.info-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -82,6 +76,18 @@ const title = '我的 IP 查詢工具';
 			font-weight: 600;
 			color: #55637a;
 			text-transform: uppercase;
+		}
+
+		/* 新增讓國旗和 Country 同行顯示 */
+		.info-label-flag {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.flag {
+			font-size: 1.8rem;
+			vertical-align: middle;
 		}
 
 		.info-value {
@@ -121,7 +127,7 @@ const title = '我的 IP 查詢工具';
 
 			<div class="ip-title">你的公開 IP 地址</div>
 			<div class="ip-address" id="ip">載入中...</div>
-			<span class="flag" id="flag"></span>
+			<!-- 移除國旗顯示的 span -->
 
 			<div class="info-grid" id="details"></div>
 
@@ -147,7 +153,6 @@ function countryToFlag(countryCode) {
 
 async function fetchIP() {
 	document.getElementById('ip').textContent = '載入中...';
-	document.getElementById('flag').textContent = '';
 
 	const ipRes = await fetch('https://api.ipify.org?format=json');
 	const { ip } = await ipRes.json();
@@ -157,25 +162,27 @@ async function fetchIP() {
 	const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
 	const info = await infoRes.json();
 
-	// 國旗
-	document.getElementById('flag').textContent = countryToFlag(info.country);
-
-	// 經緯度
-	let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
-
-	// 詳細資料
+	// 詳細資料（Country 行加入國旗）
 	document.getElementById('details').innerHTML = `
-		<div class="info-box"><div class="info-label">Country</div><div class="info-value">${info.country}</div></div>
+		<div class="info-box">
+			<div class="info-label info-label-flag">
+				Country <span class="flag">${countryToFlag(info.country)}</span>
+			</div>
+			<div class="info-value">${info.country}</div>
+		</div>
 		<div class="info-box"><div class="info-label">City</div><div class="info-value">${info.city}</div></div>
 		<div class="info-box"><div class="info-label">Region</div><div class="info-value">${info.region}</div></div>
 		<div class="info-box"><div class="info-label">ISP</div><div class="info-value">${info.org}</div></div>
 		<div class="info-box"><div class="info-label">ASN</div><div class="info-value">${info.org?.split(" ")[0] || '-'}</div></div>
-		<div class="info-box"><div class="info-label">GPS</div><div class="info-value">${lat}, ${lon}</div></div>
+		<div class="info-box"><div class="info-label">GPS</div><div class="info-value">${info.loc ? info.loc.replace(',', ', ') : '0, 0'}</div></div>
 		<div class="info-box"><div class="info-label">Timezone</div><div class="info-value">${info.timezone}</div></div>
 		<div class="info-box"><div class="info-label">VPN / Proxy</div><div class="info-value">
 			${info.privacy?.vpn ? '✔ VPN' : '❌ No'}
 		</div></div>
 	`;
+
+	// 經緯度分離（避免 null 或 undefined）
+	let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
 
 	// Leaflet 地圖
 	let map = L.map('map').setView([lat, lon], 10);
