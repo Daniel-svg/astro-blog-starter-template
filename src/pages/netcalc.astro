@@ -11,387 +11,391 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-    <!-- 💡 BaseHead 負責引入全域 CSS -->
-    <BaseHead title={title} description={description} />
+  <BaseHead title={title} description={description} />
 
-    <!-- Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      crossorigin="anonymous"
-    />
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    crossorigin="anonymous"
+  />
 
-    <!-- Google Ads -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
-      crossorigin="anonymous"
-    ></script>
+  <!-- Google Ads -->
+  <script
+    async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
+    crossorigin="anonymous"
+  ></script>
 
-    <!-- 專屬 CSS -->
-<style>
-  body {
-    background: #f5f7fb;
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  }
-
-  .calculator-container {
-        background: white;
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 14px;
-        padding: 24px;
-        margin-top: 24px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  }
-
-  .calculator-container:hover {
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
-  }
-
-  h1 {
-    font-size: 1.9rem;
-    color: #1f2937;
-    margin-bottom: 1.8rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .input-group {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-
-  @media (min-width: 760px) {
-    .input-group {
-      grid-template-columns: 1fr 1fr;
+  <style>
+    body {
+      background: #f5f7fb;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     }
-  }
 
-  input[type="text"] {
-    padding: 14px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    background: #f9fafb;
-    font-size: 1rem;
-    transition: 0.25s;
-    width: 100%;
-  }
+    /* ===== Layout Card ===== */
+    .calculator-container {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 24px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.25s;
+    }
 
-  input[type="text"]:focus {
-    border-color: #000;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
-  }
+    .calculator-container:hover {
+      box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+    }
 
-  /* ====== 按鈕（黑灰色） ====== */
-  .calculate-btn {
-    padding: 14px 20px;
-    border-radius: 10px;
-    border: none;
-    background: #1f1f1f;
-    color: #fff;
-    width: 100%;
-    font-size: 1.05rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: 0.25s;
-  }
+    /* ===== Title ===== */
+    h1 {
+      font-size: 1.9rem;
+      color: #1f2937;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  .calculate-btn:hover {
-    background: #000;
-  }
+    /* ===== Input Group ===== */
+    .input-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
 
-  /* 二進位切換 */
-  .toggle-bin {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #f3f4f6;
-    border-radius: 10px;
-    color: #4b5563;
-    cursor: pointer;
-    margin-top: 16px;
-    font-size: 0.95rem;
-    transition: 0.25s;
-  }
+    @media (min-width: 760px) {
+      .input-group {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
 
-  .toggle-bin:hover {
-    background: #e5e7eb;
-  }
+    input[type="text"] {
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #f9fafb;
+      font-size: 1rem;
+      width: 100%;
+      transition: 0.25s;
+    }
 
-  /* ====== 結果區 ====== */
-  .results {
-    margin-top: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+    input[type="text"]:focus {
+      border-color: #000;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
+    }
 
-  .results > div {
-    background: #ffffff;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
+    /* ===== Button ===== */
+    .calculate-btn {
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: none;
+      background: #1f1f1f;
+      color: #fff;
+      width: 100%;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: 0.25s;
+    }
 
-    /* ⭐ 新增 hover 特效 ⭐ */
-    transition: 0.25s;
-  }
+    .calculate-btn:hover {
+      background: #000;
+    }
 
-  /* ⭐ 滑過去時效果：微浮起 + 陰影 + 放大 ⭐ */
-  .results > div:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    border-color: #d1d5db;
-  }
+    /* ===== Toggle Binary ===== */
+    .toggle-bin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #f3f4f6;
+      border-radius: 10px;
+      color: #4b5563;
+      cursor: pointer;
+      margin-top: 16px;
+      font-size: 0.95rem;
+      transition: 0.25s;
+    }
 
-  .results strong {
-    color: #374151;
-    width: 190px;
-    font-weight: 600;
-  }
+    .toggle-bin:hover {
+      background: #e5e7eb;
+    }
 
-  .results span {
-    font-family: "Roboto Mono", monospace;
-    font-size: 0.95rem;
-    word-break: break-word;
-  }
+    /* ===== Results ===== */
+    .results {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-  /* 重點結果（藍框維持原樣） */
-  .primary-result {
-    background: #eff6ff !important;
-    border-left: 4px solid #2563eb !important;
-  }
+    .results > div {
+      background: white;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      transition: 0.25s;
+    }
 
-  .binary-val {
-    font-size: 0.82rem;
-    color: #6b7280;
-  }
+    .results > div:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      border-color: #d1d5db;
+    }
 
-  .error-message {
-    background: #fee2e2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: 700;
-    text-align: center;
-  }
+    .results strong {
+      color: #374151;
+      width: 190px;
+      font-weight: 600;
+    }
 
-  /* 📱 防止手機輸入框溢出 card */
-  @media (max-width: 480px) {
-  input[type="text"],
-  .calculate-btn,
-  .toggle-bin {
-    max-width: 100%;
-    box-sizing: border-box; /* ⭐ 修正重點 */
-  }
+    .results span {
+      font-family: "Roboto Mono", monospace;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
 
-  .input-group {
-    width: 100%;
-  }
-}
+    .primary-result {
+      background: #eff6ff !important;
+      border-left: 4px solid #2563eb !important;
+    }
 
-</style>
+    .binary-val {
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
 
+    .error-message {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* ===== Mobile Fixes ===== */
+    @media (max-width: 480px) {
+      input[type="text"],
+      .calculate-btn,
+      .toggle-bin {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .input-group {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <Header />
+  <Header />
 
-    <main>
-      <div class="calculator-container">
-        
-        <h1><i class="fas fa-network-wired"></i> 網段計算機</h1>
+  <main>
+    <div class="calculator-container">
 
-        <!-- 輸入欄位 -->
-        <div class="input-group">
-          <input type="text" id="cidrInput" placeholder="IP/子網 (例: 192.168.1.10/24)">
-          <input type="text" id="maskInput" placeholder="或子網遮罩 (例: 255.255.255.0)">
-        </div>
+      <h1><i class="fas fa-network-wired"></i> 網段計算機</h1>
 
-        <button class="calculate-btn" onclick="calculate()">
-          <i class="fas fa-calculator"></i> 開始計算
-        </button>
+      <div class="input-group">
+        <input type="text" id="cidrInput" placeholder="IP/子網 (例: 192.168.1.10/24)">
+        <input type="text" id="maskInput" placeholder="或子網遮罩 (例: 255.255.255.0)">
+      </div>
 
-        <div class="toggle-bin" id="toggleBinaryButton" onclick="toggleBinary()">
-          <i class="fas fa-exchange-alt"></i> 切換二進位顯示
-        </div>
+      <button class="calculate-btn" onclick="calculate()">
+        <i class="fas fa-calculator"></i> 開始計算
+      </button>
 
-        <!-- 結果區 -->
-        <div class="results" id="results">
-          <div style="text-align:center; border-bottom:none; background:transparent;">
-            <i class="fas fa-mouse-pointer"></i> 請輸入 IP 地址開始計算
-          </div>
+      <div class="toggle-bin" id="toggleBinaryButton" onclick="toggleBinary()">
+        <i class="fas fa-exchange-alt"></i> 切換二進位顯示
+      </div>
+
+      <div class="results" id="results">
+        <div style="text-align:center; border-bottom:none; background:transparent;">
+          <i class="fas fa-mouse-pointer"></i> 請輸入 IP 地址開始計算
         </div>
       </div>
-    </main>
+    </div>
+  </main>
 
-    <Footer />
+  <Footer />
 
-    <!-- JS -->
-    <script is:inline>
-      /* IP Helper 函數 */
-      function ipToInt(ipArr){
-        return (ipArr[0]>>>0)*16777216 +
-               (ipArr[1]>>>0)*65536 +
-               (ipArr[2]>>>0)*256 +
-               (ipArr[3]>>>0);
+  <!-- JS -->
+  <script is:inline>
+    /* ===== Utility Functions ===== */
+    function ipToInt(ipArr) {
+      return (ipArr[0] >>> 0) * 16777216 +
+             (ipArr[1] >>> 0) * 65536 +
+             (ipArr[2] >>> 0) * 256 +
+             (ipArr[3] >>> 0);
+    }
+
+    function intToIp(int) {
+      return [
+        (int >>> 24) & 255,
+        (int >>> 16) & 255,
+        (int >>> 8) & 255,
+        int & 255
+      ];
+    }
+
+    function ipToBinary(ip) {
+      return ip.split('.')
+        .map(n => parseInt(n).toString(2).padStart(8, "0"))
+        .join('.');
+    }
+
+    function isPrivateIP(ip) {
+      const [a, b] = ip.split('.').map(Number);
+      if (a === 10) return "私有網段 (A 類)";
+      if (a === 172 && b >= 16 && b <= 31) return "私有網段 (B 類)";
+      if (a === 192 && b === 168) return "私有網段 (C 類)";
+      if (a === 127) return "迴圈本地 (Loopback)";
+      if (a >= 224 && a <= 239) return "多播地址 (Multicast)";
+      return "公網IP";
+    }
+
+    let showBinary = false;
+
+    /* ===== Main Calculate ===== */
+    function calculate() {
+      const cidrInput = document.getElementById('cidrInput').value.trim();
+      const maskVal = document.getElementById('maskInput').value.trim();
+      const results = document.getElementById('results');
+
+      let ip, mask, prefix;
+
+      if (cidrInput.includes('/')) {
+        [ip, prefix] = cidrInput.split('/');
+        prefix = parseInt(prefix);
+
+        mask = Array(4).fill(0).map((_, i) => {
+          let rem = prefix - i * 8;
+          if (rem >= 8) return 255;
+          if (rem <= 0) return 0;
+          return 256 - Math.pow(2, 8 - rem);
+        }).join('.');
+      }
+      else if (cidrInput && maskVal) {
+        ip = cidrInput;
+        mask = maskVal;
+
+        prefix = mask.split('.')
+          .map(n => parseInt(n).toString(2).replace(/0/g, "").length)
+          .reduce((a, b) => a + b, 0);
+      }
+      else {
+        results.innerHTML =
+          `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> 請輸入有效 IP 或 CIDR</div>`;
+        return;
       }
 
-      function intToIp(int){
-        return [
-          (int>>>24)&255,
-          (int>>>16)&255,
-          (int>>>8)&255,
-          int&255
-        ];
+      const ipParts = ip.split('.').map(Number);
+      const maskParts = mask.split('.').map(Number);
+
+      if (
+        ipParts.some(n => isNaN(n) || n < 0 || n > 255) ||
+        maskParts.some(n => isNaN(n) || n < 0 || n > 255) ||
+        prefix < 0 || prefix > 32
+      ) {
+        results.innerHTML =
+          `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> 輸入格式錯誤 (IP 0–255, CIDR 0–32)</div>`;
+        return;
       }
 
-      function ipToBinary(ip){
-        return ip.split('.')
-          .map(n => parseInt(n).toString(2).padStart(8, "0"))
-          .join('.');
+      const network = ipParts.map((n, i) => n & maskParts[i]);
+      const wildcard = maskParts.map(n => (~n & 255));
+      const broadcast = network.map((n, i) => n | wildcard[i]);
+
+      const netInt = ipToInt(network);
+      const bcInt = ipToInt(broadcast);
+
+      let hostMinInt, hostMaxInt;
+      let hostCount = Math.pow(2, 32 - prefix);
+
+      if (prefix === 32) {
+        hostMinInt = hostMaxInt = netInt;
+        hostCount = 1;
+      } 
+      else if (prefix === 31) {
+        hostMinInt = netInt;
+        hostMaxInt = bcInt;
+        hostCount = 2;
+      } 
+      else {
+        hostMinInt = netInt + 1;
+        hostMaxInt = bcInt - 1;
+        hostCount -= 2;
       }
 
-      function isPrivateIP(ip){
-        const [a,b] = ip.split('.').map(Number);
-        if(a===10) return "私有網段 (A 類)";
-        if(a===172 && b>=16 && b<=31) return "私有網段 (B 類)";
-        if(a===192 && b===168) return "私有網段 (C 類)";
-        if(a===127) return "迴圈本地 (Loopback)";
-        if(a>=224 && a<=239) return "多播地址 (Multicast)";
-        return "公網IP";
+      const hostMin = intToIp(hostMinInt);
+      const hostMax = intToIp(hostMaxInt);
+
+      function display(arr) {
+        const str = arr.join('.');
+        return showBinary
+          ? `<span class="binary-val">${ipToBinary(str)}</span><span>(${str})</span>`
+          : str;
       }
 
-      let showBinary = false;
-
-      function calculate(){
-        const cidrInput = document.getElementById('cidrInput').value.trim();
-        const maskVal   = document.getElementById('maskInput').value.trim();
-        const results   = document.getElementById('results');
-
-        let ip, mask, prefix;
-
-        if(cidrInput.includes('/')){
-          [ip, prefix] = cidrInput.split('/');
-          prefix = parseInt(prefix);
-          mask = Array(4).fill(0).map((_,i)=>{
-            let rem = prefix - i*8;
-            if(rem>=8) return 255;
-            if(rem<=0) return 0;
-            return 256 - Math.pow(2, 8-rem);
-          }).join('.');
-        }
-        else if(cidrInput && maskVal){
-          ip = cidrInput;
-          mask = maskVal;
-          prefix = mask.split('.')
-                         .map(n => parseInt(n).toString(2).replace(/0/g,"").length)
-                         .reduce((a,b)=>a+b,0);
-        }
-        else {
-          results.innerHTML =
-            `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> 請輸入有效 IP 或 CIDR</div>`;
-          return;
-        }
-
-        const ipParts  = ip.split('.').map(Number);
-        const maskParts = mask.split('.').map(Number);
-
-        if(ipParts.some(n=>isNaN(n)||n<0||n>255)
-        || maskParts.some(n=>isNaN(n)||n<0||n>255)
-        || prefix<0 || prefix>32){
-          results.innerHTML =
-            `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> 輸入格式錯誤 (IP 0–255, CIDR 0–32)</div>`;
-          return;
-        }
-
-        const network  = ipParts.map((n,i)=> n & maskParts[i]);
-        const wildcard = maskParts.map(n => (~n & 255));
-        const broadcast = network.map((n,i)=> n | wildcard[i]);
-
-        const netInt = ipToInt(network);
-        const bcInt  = ipToInt(broadcast);
-
-        let hostMinInt, hostMaxInt, hostCount = Math.pow(2, 32-prefix);
-
-        if(prefix === 32){
-          hostMinInt = hostMaxInt = netInt;
-          hostCount = 1;
-        } else if(prefix === 31){
-          hostMinInt = netInt;
-          hostMaxInt = bcInt;
-          hostCount = 2;
-        } else {
-          hostMinInt = netInt + 1;
-          hostMaxInt = bcInt - 1;
-          hostCount -= 2;
-        }
-
-        const hostMin = intToIp(hostMinInt);
-        const hostMax = intToIp(hostMaxInt);
-
-        function display(arr){
-          const str = arr.join('.');
-          return showBinary
-            ? `<span class="binary-val">${ipToBinary(str)}</span><span>(${str})</span>`
-            : str;
-        }
-
-        function displayMask(m){
-          return showBinary
-            ? `<span class="binary-val">${ipToBinary(m)}</span><span>(${m})</span>`
-            : m;
-        }
-
-        results.innerHTML = `
-          <div><strong><i class="fas fa-search"></i> 輸入 IP:</strong><span>${display(ipParts)}</span></div>
-          <div><strong><i class="fas fa-tag"></i> IP 類型:</strong><span>${isPrivateIP(ip)}</span></div>
-          <div><strong><i class="fas fa-divide"></i> 子網位元 (CIDR):</strong><span>/${prefix}</span></div>
-          <div><strong><i class="fas fa-bars"></i> 子網遮罩 (Mask):</strong><span>${displayMask(mask)}</span></div>
-          
-          <div class="primary-result">
-            <strong><i class="fas fa-home"></i> 網段位址 (Network ID):</strong>
-            <span>${display(network)}</span>
-          </div>
-
-          <div class="primary-result">
-            <strong><i class="fas fa-broadcast-tower"></i> 廣播位址 (Broadcast):</strong>
-            <span>${display(broadcast)}</span>
-          </div>
-
-          <div class="primary-result">
-            <strong><i class="fas fa-arrows-alt-h"></i> 可用主機範圍:</strong>
-            <span>${display(hostMin)} - ${display(hostMax)}</span>
-          </div>
-          
-          <div><strong><i class="fas fa-users"></i> 可用主機數量:</strong><span>${hostCount}</span></div>
-        `;
+      function displayMask(m) {
+        return showBinary
+          ? `<span class="binary-val">${ipToBinary(m)}</span><span>(${m})</span>`
+          : m;
       }
 
-      function toggleBinary(){
-        showBinary = !showBinary;
+      results.innerHTML = `
+        <div><strong><i class="fas fa-search"></i> 輸入 IP:</strong><span>${display(ipParts)}</span></div>
+        <div><strong><i class="fas fa-tag"></i> IP 類型:</strong><span>${isPrivateIP(ip)}</span></div>
+        <div><strong><i class="fas fa-divide"></i> 子網位元 (CIDR):</strong><span>/${prefix}</span></div>
+        <div><strong><i class="fas fa-bars"></i> 子網遮罩 (Mask):</strong><span>${displayMask(mask)}</span></div>
 
-        document.getElementById('toggleBinaryButton').innerHTML =
-          showBinary
+        <div class="primary-result">
+          <strong><i class="fas fa-home"></i> 網段位址 (Network ID):</strong>
+          <span>${display(network)}</span>
+        </div>
+
+        <div class="primary-result">
+          <strong><i class="fas fa-broadcast-tower"></i> 廣播位址 (Broadcast):</strong>
+          <span>${display(broadcast)}</span>
+        </div>
+
+        <div class="primary-result">
+          <strong><i class="fas fa-arrows-alt-h"></i> 可用主機範圍:</strong>
+          <span>${display(hostMin)} - ${display(hostMax)}</span>
+        </div>
+
+        <div><strong><i class="fas fa-users"></i> 可用主機數量:</strong><span>${hostCount}</span></div>
+      `;
+    }
+
+    function toggleBinary() {
+      showBinary = !showBinary;
+
+      document.getElementById('toggleBinaryButton').innerHTML =
+        showBinary
           ? `<i class="fas fa-align-left"></i> 切換為十進位顯示`
           : `<i class="fas fa-exchange-alt"></i> 切換二進位顯示`;
 
-        if (document.getElementById('cidrInput').value.trim() || document.getElementById('maskInput').value.trim()) {
-          calculate();
-        }
+      if (
+        document.getElementById('cidrInput').value.trim() ||
+        document.getElementById('maskInput').value.trim()
+      ) {
+        calculate();
       }
-    </script>
+    }
+  </script>
 </body>
 </html>
