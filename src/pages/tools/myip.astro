@@ -50,50 +50,55 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
       word-break: break-all;
     }
 
-    .details-grid {
-      display: grid;
-      color: #2563eb;
-      background: #eef4ff;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-      text-align: left;
-    }
+	.details-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 自動調整欄位 */
+		gap: 15px; /* 格子間距 */
+		margin-bottom: 30px;
+		text-align: left;
+		padding: 10px;
+		box-sizing: border-box;
+		background: transparent; /* 移除背景，避免和子元素衝突 */
+	}
 
-    .detail-box {
-      background-color: #ffffff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e3ebf5;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.2s;
-    }
+	.detail-box {
+		background-color: #eef4ff; /* 每個子項都有背景色 */
+		padding: 15px;
+		border-radius: 10px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+		border: 1px solid #e3ebf5;
+		display: flex;
+		flex-direction: column;
+		transition: all 0.2s;
+		box-sizing: border-box;
+	}
 
-    .detail-box:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    }
+	.detail-box:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+	}
 
-    .detail-label {
-      font-weight: 600;
-      color: #55637a;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
-      font-size: 0.9rem;
-    }
+	.detail-label {
+		font-weight: 600;
+		color: #55637a;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 5px;
+		font-size: 0.9rem;
+	}
 
-    .detail-value {
-      font-weight: 700;
-      color: #1c2a3a;
-      font-size: 1.1rem;
-      word-break: break-all;
-    }
+	.detail-value {
+		font-weight: 700;
+		color: #1c2a3a;
+		font-size: 1.1rem;
+		word-break: break-all;
+	}
 
-    .flag { font-size: 1.5rem; }
+	.flag {
+		font-size: 1.5rem;
+	}
+
 
     #map {
       width: 100%;
