@@ -31,9 +31,6 @@ const description = '查詢公開 IP、ISP 與地理位置';
         margin-bottom: 16px;
       }
 
-      /* =======================
-         表單 RWD 修正（關鍵）
-      ======================= */
       #ip-form {
         display: flex;
         gap: 12px;
@@ -61,9 +58,6 @@ const description = '查詢公開 IP、ISP 與地理位置';
         background: #2563eb;
       }
 
-      /* =======================
-         grid
-      ======================= */
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -84,9 +78,6 @@ const description = '查詢公開 IP、ISP 與地理位置';
         border-radius: 12px;
       }
 
-      /* =======================
-         手機 RWD
-      ======================= */
       @media (max-width: 600px) {
         main {
           padding: 16px;
@@ -131,30 +122,34 @@ const description = '查詢公開 IP、ISP 與地理位置';
 
     <script>
       async function fetchIP(ip) {
-        const res = await fetch(`https://ipapi.co/${ip}/json/`);
+        const res = await fetch("https://ipapi.co/" + ip + "/json/");
         return res.json();
       }
 
-      const form = document.querySelector('#ip-form');
-      const input = document.querySelector('#ip-input');
-      const result = document.querySelector('#ip-result');
-      const map = document.querySelector('#map');
+      const form = document.querySelector("#ip-form");
+      const input = document.querySelector("#ip-input");
+      const result = document.querySelector("#ip-result");
+      const map = document.querySelector("#map");
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener("submit", async function (e) {
         e.preventDefault();
         const ip = input.value.trim();
         const data = await fetchIP(ip);
 
-        result.innerHTML = `
-          <div class="item">IP：${data.ip}</div>
-          <div class="item">ISP：${data.org || 'N/A'}</div>
-          <div class="item">國家：${data.country_name}</div>
-          <div class="item">城市：${data.city}</div>
-          <div class="item">緯度：${data.latitude}</div>
-          <div class="item">經度：${data.longitude}</div>
-        `;
+        result.innerHTML =
+          '<div class="item">IP：' + data.ip + "</div>" +
+          '<div class="item">ISP：' + (data.org || "N/A") + "</div>" +
+          '<div class="item">國家：' + data.country_name + "</div>" +
+          '<div class="item">城市：' + data.city + "</div>" +
+          '<div class="item">緯度：' + data.latitude + "</div>" +
+          '<div class="item">經度：' + data.longitude + "</div>";
 
-        map.src = \`https://maps.google.com/maps?q=\${data.latitude},\${data.longitude}&z=10&output=embed\`;
+        map.src =
+          "https://maps.google.com/maps?q=" +
+          data.latitude +
+          "," +
+          data.longitude +
+          "&z=10&output=embed";
       });
     </script>
   </body>
