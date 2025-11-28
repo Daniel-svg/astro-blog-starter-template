@@ -9,227 +9,265 @@ const title = '我的 IP 查詢工具';
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <BaseHead title={title} />
+  <BaseHead title={title} />
 
-  <!-- Leaflet 地圖套件 -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f5f7fb;
-      font-family: "Inter", system-ui, sans-serif;
-      color: #1f2d3d;
-    }
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+      font-family: "Inter", system-ui, sans-serif;
+      color: #1f2d3d;
+    }
 
-    .main-container {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 1.5em;
-      text-align: center;
-    }
+    .main-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 1.5em;
+      text-align: center;
+    }
 
-    .card {
-      background: white;
-      padding: 40px;
-      border-radius: 18px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-    }
+    .card {
+      background: white;
+      padding: 40px; /* 保持卡片內邊距 */
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
 
-    .ip-title {
-      font-size: 1.5rem;
-      color: #3a475d;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
+    .ip-title {
+      font-size: 1.5rem;
+      color: #3a475d;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
 
-    .ip-address {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #2563eb;
-      background: #eef4ff;
-      padding: 10px 20px;
-      border-radius: 12px;
-      margin: 0 auto 25px;
-      display: inline-block;
-    }
+    .ip-address {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #2563eb;
+      background: #eef4ff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin: 0 auto 25px;
+      display: inline-block;
+    }
 
-    .info-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 20px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      font-size: 1rem;
-      transition: transform 0.2s;
-    }
+    /* --- 排版優化區 --- */
+    #details {
+      display: grid; /* 使用 CSS Grid 佈局 */
+      grid-template-columns: repeat(2, 1fr); /* 設置為兩欄，每欄佔據相同寬度 */
+      gap: 15px; /* 網格間距 */
+      margin-bottom: 30px;
+      text-align: left; /* 讓內容靠左對齊 */
+    }
 
-    .info-box:hover {
-      transform: translateY(-2px);
-    }
+    .info-box {
+      /* 移除原有的 Flexbox 佈局，改用 Grid 的對齊和樣式 */
+      padding: 20px; /* 增加內邊距以更好地容納內容 */
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #f0f4fa; /* 統一背景色，消除交替顏色 */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 添加輕微陰影增強立體感 */
+      display: flex;
+      flex-direction: column; /* 讓標籤和值垂直排列 */
+      align-items: flex-start; /* 靠左對齊 */
+    }
 
-    #details > .info-box:nth-child(odd) {
-      background: #f0f4fa;
-    }
+    /* 移除原有的 nth-child 樣式，統一風格 */
+    #details > .info-box:nth-child(odd),
+    #details > .info-box:nth-child(even) {
+      background: #f0f4fa;
+    }
 
-    #details > .info-box:nth-child(even) {
-      background: #e3ebf5;
-    }
+    .info-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
 
-    .info-label {
-      font-weight: 600;
-      color: #55637a;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .info-label {
+      font-weight: 600;
+      color: #55637a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px; /* 標籤與值之間的間距 */
+      font-size: 0.9rem; /* 略微縮小標籤字體 */
+    }
 
-    .info-value {
-      font-weight: 600;
-      color: #1c2a3a;
-      text-align: right;
-    }
+    .info-value {
+      font-weight: 700; /* 加粗數值 */
+      color: #1c2a3a;
+      text-align: left; /* 靠左對齊 */
+      font-size: 1.15rem; /* 突出數值 */
+      word-break: break-all; /* 防止長字串溢出 */
+    }
+    /* --- 排版優化區結束 --- */
 
-    .flag {
-      font-size: 1.5rem;
-    }
 
-    #map {
-      width: 100%;
-      height: 350px;
-      margin-top: 30px;
-      border-radius: 14px;
-      overflow: hidden;
-    }
+    .flag {
+      font-size: 1.5rem;
+    }
 
-    .reload-btn {
-      margin-top: 25px;
-      padding: 12px 32px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+    #map {
+      width: 100%;
+      height: 350px;
+      margin-top: 30px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
 
-    .data-source {
-      margin-top: 30px;
-      font-size: 0.85rem;
-      color: #55637a;
-      text-align: center;
-    }
+    .reload-btn {
+      margin-top: 25px;
+      padding: 12px 32px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
 
-    .data-source a {
-      color: #2563eb;
-      text-decoration: none;
-    }
+    .reload-btn:hover {
+      background: #1e40af;
+    }
 
-    .data-source a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    .data-source {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: #55637a;
+      text-align: center;
+    }
+
+    .data-source a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .data-source a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 
 <body>
-  <Header />
+  <Header />
 
-  <main class="main-container">
-    <div class="card">
-      <div class="ip-title">你的公開 IP 地址</div>
-      <div class="ip-address" id="ip">載入中...</div>
+  <main class="main-container">
+    <div class="card">
+      <div class="ip-title">你的公開 IP 地址</div>
+      <div class="ip-address" id="ip">載入中...</div>
 
-      <div id="details"></div>
+      <div id="details"></div>
 
-      <div id="map"></div>
-    </div>
+      <div id="map"></div>
+    </div>
 
-    <button class="reload-btn" id="reload">重新整理</button>
+    <button class="reload-btn" id="reload">重新整理</button>
 
-    <div class="data-source">
-      <p>數據來源：</p>
-      <p>
-        公開 IP 查詢由 
-        <a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
-        提供；地理位置資訊由 
-        <a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
-        提供。
-      </p>
-    </div>
-  </main>
+    <div class="data-source">
+      <p>數據來源：</p>
+      <p>
+        公開 IP 查詢由 
+        <a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
+        提供；地理位置資訊由 
+        <a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
+        提供。
+      </p>
+    </div>
+  </main>
 
-  <Footer />
+  <Footer />
 
-  <script>
-    function countryToFlag(countryCode) {
-      if (!countryCode) return "❓";
-      return countryCode.toUpperCase().replace(/./g, char => 
-        String.fromCodePoint(char.charCodeAt(0) + 127397)
-      );
-    }
+  <script>
+    function countryToFlag(countryCode) {
+      if (!countryCode) return "❓";
+      return countryCode.toUpperCase().replace(/./g, char => 
+        String.fromCodePoint(char.charCodeAt(0) + 127397)
+      );
+    }
 
-    async function fetchIP() {
-      document.getElementById('ip').textContent = '載入中...';
-      const ipRes = await fetch('https://api.ipify.org?format=json');
-      const { ip } = await ipRes.json();
-      document.getElementById('ip').textContent = ip;
+    async function fetchIP() {
+      // 清理舊地圖和資訊
+      const mapContainer = document.getElementById('map');
+      mapContainer.innerHTML = '';
+      document.getElementById('details').innerHTML = '';
+      const ipEl = document.getElementById('ip');
+      ipEl.textContent = '載入中...';
 
-      const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
-      const info = await infoRes.json();
 
-      const detailsEl = document.getElementById('details');
-      detailsEl.innerHTML = '';
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const { ip } = await ipRes.json();
+        ipEl.textContent = ip;
 
-      const infoList = [
-        { label: 'Country', value: info.country, flag: countryToFlag(info.country) },
-        { label: 'City', value: info.city },
-        { label: 'Region', value: info.region },
-        { label: 'ISP', value: info.org },
-        { label: 'GPS', value: info.loc ? info.loc.replace(',', ', ') : '0, 0' },
-        { label: 'VPN / Proxy', value: info.privacy?.vpn ? '✔ VPN' : '❌ No' }
-      ];
+        // 使用您的 IPinfo Token
+        const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
+        const info = await infoRes.json();
 
-      infoList.forEach(item => {
-        const box = document.createElement('div');
-        box.className = 'info-box';
+        const detailsEl = document.getElementById('details');
+        // 調整了資訊列表的順序，將 VPN 放在最後
+        const infoList = [
+          { label: '國家/地區', value: info.country ? info.country : 'N/A', flag: countryToFlag(info.country) },
+          { label: '城市', value: info.city ? info.city : 'N/A' },
+          { label: '區域/州', value: info.region ? info.region : 'N/A' },
+          { label: '網際網路服務供應商 (ISP)', value: info.org ? info.org : 'N/A' },
+          { label: 'GPS 座標', value: info.loc ? info.loc.replace(',', ', ') : '0, 0' },
+          { label: 'VPN / 代理', value: info.privacy?.vpn ? '✔ 偵測到 VPN/代理' : '❌ 未偵測到' }
+        ];
+        
+        // 將標籤改為中文以提高用戶體驗
+        infoList.forEach(item => {
+          const box = document.createElement('div');
+          box.className = 'info-box';
 
-        const label = document.createElement('div');
-        label.className = 'info-label';
-        label.textContent = item.label;
-        if (item.flag) {
-          const flagSpan = document.createElement('span');
-          flagSpan.className = 'flag';
-          flagSpan.textContent = item.flag;
-          label.appendChild(flagSpan);
-        }
+          const label = document.createElement('div');
+          label.className = 'info-label';
+          label.textContent = item.label;
+          if (item.flag) {
+            const flagSpan = document.createElement('span');
+            flagSpan.className = 'flag';
+            flagSpan.textContent = item.flag;
+            label.prepend(flagSpan); // 將國旗放在最前面
+          }
 
-        const value = document.createElement('div');
-        value.className = 'info-value';
-        value.textContent = item.value;
+          const value = document.createElement('div');
+          value.className = 'info-value';
+          value.textContent = item.value;
 
-        box.appendChild(label);
-        box.appendChild(value);
-        detailsEl.appendChild(box);
-      });
+          box.appendChild(label);
+          box.appendChild(value);
+          detailsEl.appendChild(box);
+        });
 
-      let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
+        let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
 
-      let map = L.map('map').setView([lat, lon], 10);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-      }).addTo(map);
+        // 地圖初始化前需清理可能存在的舊地圖
+        if (mapContainer._leaflet_id) {
+          mapContainer._leaflet_id = undefined;
+        }
+        
+        let map = L.map('map').setView([lat, lon], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+        }).addTo(map);
 
-      L.marker([lat, lon]).addTo(map)
-        .bindPopup(`${info.city}, ${info.country}`)
-        .openPopup();
-    }
+        L.marker([lat, lon]).addTo(map)
+          .bindPopup(`${info.city ? info.city + ', ' : ''}${info.country}`)
+          .openPopup();
+      } catch (error) {
+        ipEl.textContent = '載入失敗';
+        console.error('Error fetching IP or info:', error);
+      }
+    }
 
-    document.getElementById("reload").onclick = fetchIP;
-    fetchIP();
-  </script>
+    // 確保地圖在重新載入時能夠正確銷毀和重新初始化
+    document.getElementById("reload").onclick = fetchIP;
+    fetchIP();
+  </script>
 
 </body>
 </html>
