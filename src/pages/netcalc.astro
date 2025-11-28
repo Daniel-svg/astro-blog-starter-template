@@ -286,10 +286,8 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
         prefix = parseInt(prefix);
 
         mask = Array(4).fill(0).map((_, i) => {
-          let rem = prefix - i * 8;
-          if (rem >= 8) return 255;
-          if (rem <= 0) return 0;
-          return 256 - Math.pow(2, 8 - rem);
+          let bits = Math.max(0, Math.min(8, prefix - i * 8));
+          return 256 - Math.pow(2, 8 - bits);
         }).join('.');
       }
       else if (cidrInput && maskVal) {
