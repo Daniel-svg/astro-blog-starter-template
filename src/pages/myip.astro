@@ -1,7 +1,7 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 const title = 'IP 查詢工具';
 const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格）';
@@ -77,7 +77,7 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
         </div>
       </div>
 
-      <p class="source">資料來源：ipapi.co • ipify • OpenStreetMap</p>
+      <p class="source">資料來源：ipinfo.io • ipify • OpenStreetMap</p>
     </main>
 
     <Footer />
@@ -85,28 +85,45 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
     <!-- ===== JS ===== -->
     <script>
       async function loadIP() {
-        const res = await fetch("https://ipapi.co/json/");
+        const res = await fetch("https://ipinfo.io/json?token=1b172809b09566");
         const d = await res.json();
 
+        const [lat, lon] = d.loc.split(",");
+
+        // ========== 基本資訊 ==========
         document.getElementById("ip").textContent = d.ip;
         document.getElementById("isp").textContent = "ISP：" + (d.org || "未知");
-        document.getElementById("loc").textContent = "位置：" + d.city + ", " + d.country_name;
+        document.getElementById("loc").textContent = "位置：" + d.city + ", " + d.country;
         document.getElementById("tz").textContent = "時區：" + d.timezone;
-        document.getElementById("asn").textContent = "ASN：" + d.asn;
 
+        // org → AS12345 Something ISP
+        const asn = d.org?.split(" ")[0] || "未知";
+        document.getElementById("asn").textContent = "ASN：" + asn;
+
+        // ========== 詳細 ==========
         document.getElementById("city").textContent = d.city;
-        document.getElementById("country").textContent = d.country_name;
+        document.getElementById("country").textContent = d.country;
         document.getElementById("region").textContent = d.region;
-        document.getElementById("postal").textContent = d.postal;
-        document.getElementById("coord").textContent = d.latitude + ", " + d.longitude;
+        document.getElementById("postal").textContent = d.postal || "—";
+        document.getElementById("coord").textContent = d.loc;
 
-        // Map
-        const map = L.map("map").setView([d.latitude, d.longitude], 11);
+        // ========== 地圖 ==========
+        const map = L.map("map").setView([lat, lon], 11);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-        L.marker([d.latitude, d.longitude]).addTo(map);
+        L.marker([lat, lon]).addTo(map);
       }
 
       loadIP();
+
+      // 按鈕：複製
+      document.getElementById("copyBtn").onclick = () => {
+        navigator.clipboard.writeText(document.getElementById("ip").textContent);
+      };
+
+      // 按鈕：刷新
+      document.getElementById("refreshBtn").onclick = () => {
+        loadIP();
+      };
     </script>
 
     <!-- ===== Cloudflare UI Style ===== -->
@@ -178,7 +195,15 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
         font-size: 0.9rem;
       }
 
+     /* 修正地圖在手機超出卡片寬度 */
+      .map-wrap {
+        width: 100%;
+        overflow: hidden;       /* 防止地圖溢出 */
+        border-radius: 12px;
+      }
+
       #map {
+        width: 100% !important; /* 強制地圖跟著卡片寬度 */
         height: 260px;
         border-radius: 12px;
       }
@@ -199,6 +224,9 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
         .cf-card.top {
           grid-template-columns: 1fr;
         }
+
+         .map-wrap {
+          margin-top: 12px;
       }
     </style>
   </body>
