@@ -1,0 +1,29 @@
+<style>
+  .right-ads {
+    position: fixed;
+    right: 12px;
+    top: 120px;
+    width: 300px;
+    z-index: 9999;
+  }
+
+  /* 手機自動隱藏（AdSense 規定不能在手機放 fixed 廣告） */
+  @media (max-width: 768px) {
+    .right-ads {
+      display: none;
+    }
+  }
+</style>
+
+<div class="right-ads">
+  <ins class="adsbygoogle"
+    style="display:block;"
+    data-ad-client="ca-pub-6026639928482840"
+    data-ad-slot="YOUR_SLOT_ID"
+    data-ad-format="rectangle"
+    data-full-width-responsive="false"></ins>
+
+  <script is:inline>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>

@@ -1,0 +1,33 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import AdsRight from "../components/AdsRight.astro";
+
+const { title, description } = Astro.props;
+---
+
+<html lang="zh-Hant">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+
+  <body>
+    <Header />
+
+    <div style="display: flex; gap: 20px; justify-content: center;">
+
+      <!-- ⭐ 主內容區（佔最大空間） -->
+      <main style="flex: 1; max-width: 860px;">
+        <slot />
+      </main>
+
+      <!-- ⭐ 右側廣告（固定寬度）-->
+      <aside style="width: 250px;">
+        <AdsRight />
+      </aside>
+    </div>
+
+    <Footer />
+  </body>
+</html>
