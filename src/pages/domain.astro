@@ -40,7 +40,10 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         padding: 26px;
         border-radius: var(--card-radius);
         border: 1px solid var(--border);
+        width: 100%;             /* ⭐ 確保永遠不超過螢幕 */
+        box-sizing: border-box;  /* ⭐ padding 不會把卡片撐爆 */
       }
+
 
       h1 {
         margin: 0 0 14px;
@@ -93,16 +96,13 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
       }
 
      @media (max-width: 780px) {
-        .cf-card.top {
-          grid-template-columns: 1fr;
-        }
-
-         .map-wrap {
-          margin-top: 12px;
+      .card {
+         padding: 16px;  /* ⭐ 手機更舒服 */
       }
+    }
+
       .source {
          text-align: center;
-      }
       }
 
       .result-box {
