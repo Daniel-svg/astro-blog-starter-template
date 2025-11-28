@@ -4,8 +4,9 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 const title = 'Domain 查詢工具';
-const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使用 Cloudflare DNS';
+const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄與是否可用';
 ---
+
 <!doctype html>
 <html lang="zh-Hant">
   <head>
@@ -17,13 +18,14 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         --panel: #ffffff;
         --border: rgba(0,0,0,0.1);
         --muted: #6b7280;
-        --accent: #2563eb;
-        --card-radius: 14px;
+        --accent: #1e293b; /* 黑灰 Cloudflare */
+        --accent-hover: #0f172a;
+        --card-radius: 12px;
       }
 
       body {
-        margin: 0;
         background: var(--bg);
+        margin: 0;
         font-family: Inter, system-ui, sans-serif;
       }
 
@@ -38,7 +40,6 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         padding: 26px;
         border-radius: var(--card-radius);
         border: 1px solid var(--border);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
       }
 
       h1 {
@@ -52,10 +53,12 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         color: var(--muted);
       }
 
+      /* Cloudflare 風格輸入區 */
       .input-box {
         display: flex;
-        gap: 8px;
+        gap: 10px;
         margin-bottom: 18px;
+        width: 100%;
       }
 
       .input-box input {
@@ -64,6 +67,14 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         border: 1px solid var(--border);
         border-radius: 10px;
         font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .input-box input:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
       }
 
       button {
@@ -74,10 +85,21 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
+        white-space: nowrap;
       }
 
       button:hover {
-        background: #1d4ed8;
+        background: var(--accent-hover);
+      }
+
+      /* 手機 RWD */
+      @media (max-width: 600px) {
+        .input-box {
+          flex-direction: column;
+        }
+        button {
+          width: 100%;
+        }
       }
 
       .result-box {
@@ -85,7 +107,7 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         padding: 20px;
         border-radius: 12px;
         border: 1px solid var(--border);
-        background: #fafafa;
+        background: #f8fafc;
       }
 
       .row {
@@ -110,10 +132,10 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
     <main class="container">
       <div class="card">
         <h1>Domain 查詢工具</h1>
-        <div class="desc">使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄與是否可註冊。</div>
+        <div class="desc">使用 Cloudflare DNS-over-HTTPS 查詢 A / AAAA / NS / MX 記錄，並判斷是否可註冊。</div>
 
         <div class="input-box">
-          <input id="domainInput" placeholder="輸入 Domain，例如：google.com" />
+          <input id="domainInput" placeholder="輸入 Domain，例如：example.com" />
           <button id="searchBtn">查詢</button>
         </div>
 
@@ -132,34 +154,34 @@ const description = '查詢 DNS 記錄、可用性、NS、MX、A、AAAA — 使�
         if (e.key === "Enter") search();
       });
 
-      function search() {
+      async function search() {
         const domain = input.value.trim();
         if (!domain) return;
 
         area.innerHTML = `<div class="result-box">查詢中...</div>`;
 
-        fetch(`/api/domain?domain=${domain}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.error) {
-              area.innerHTML = `<div class="result-box">❌ ${data.error}</div>`;
-              return;
-            }
+        try {
+          const res = await fetch(`/api/domain?domain=${domain}`);
+          const data = await res.json();
 
-            area.innerHTML = `
-              <div class="result-box">
-                <div class="row"><span class="label">Domain</span><span>${data.domain}</span></div>
-                <div class="row"><span class="label">可用?</span><span>${data.available ? '✅ 可註冊' : '❌ 已被使用'}</span></div>
-                <div class="row"><span class="label">A 記錄</span><span>${data.A || '—'}</span></div>
-                <div class="row"><span class="label">AAAA 記錄</span><span>${data.AAAA || '—'}</span></div>
-                <div class="row"><span class="label">NS 記錄</span><span>${data.NS || '—'}</span></div>
-                <div class="row"><span class="label">MX 記錄</span><span>${data.MX || '—'}</span></div>
-              </div>
-            `;
-          })
-          .catch(() => {
-            area.innerHTML = `<div class="result-box">❌ 查詢失敗（請稍後再試）</div>`;
-          });
+          if (data.error) {
+            area.innerHTML = `<div class="result-box">❌ ${data.error}</div>`;
+            return;
+          }
+
+          area.innerHTML = `
+            <div class="result-box">
+              <div class="row"><span class="label">Domain</span><span>${data.domain}</span></div>
+              <div class="row"><span class="label">可用？</span><span>${data.available ? '✅ 可註冊' : '❌ 已被使用'}</span></div>
+              <div class="row"><span class="label">A</span><span>${data.A || '—'}</span></div>
+              <div class="row"><span class="label">AAAA</span><span>${data.AAAA || '—'}</span></div>
+              <div class="row"><span class="label">NS</span><span>${data.NS || '—'}</span></div>
+              <div class="row"><span class="label">MX</span><span>${data.MX || '—'}</span></div>
+            </div>
+          `;
+        } catch (err) {
+          area.innerHTML = `<div class="result-box">❌ 查詢失敗（請稍後再試）</div>`;
+        }
       }
     </script>
   </body>

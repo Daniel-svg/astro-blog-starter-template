@@ -45,6 +45,16 @@ const description = '查詢公開 IP、ISP 與地理位置';
         border: none;
         border-radius: 12px;
       }
+       /* 手機 RWD 修正 */
+      @media (max-width: 600px) {
+        #ip-form {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
     </style>
   </head>
 
