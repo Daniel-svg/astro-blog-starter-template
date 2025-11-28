@@ -2,8 +2,6 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
-
 
 const title = '我的 IP 查詢工具';
 const description = '快速查詢你的公開 IP 地址與地理位置資訊';
@@ -18,9 +16,8 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    /* 命名空間: ip-tool */
     .ip-tool-container {
-      max-width: 700px;
+      max-width: 780px;
       margin: 40px auto;
       padding: 1.5em;
       text-align: center;
@@ -28,74 +25,66 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
 
     .ip-tool-card {
       background: white;
-      padding: 40px;
-      border-radius: 18px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
     }
 
     .ip-tool-title {
-      font-size: 1.5rem;
-      color: #3a475d;
+      font-size: 1.6rem;
+      color: #2e3a4d;
+      font-weight: 700;
       margin-bottom: 12px;
-      font-weight: 600;
     }
 
     .ip-tool-address {
-      font-size: 2.5rem;
+      font-size: 2.3rem;
       font-weight: 800;
-      color: #2563eb;
+      color: #1d4ed8;
       background: #eef4ff;
-      padding: 10px 20px;
-      border-radius: 12px;
-      margin: 0 auto 25px;
+      padding: 10px 22px;
+      border-radius: 14px;
+      margin: 0 auto 30px;
       display: inline-block;
       word-break: break-all;
     }
 
     .ip-tool-details-grid {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-      gap: 15px !important;
-      margin-bottom: 30px !important;
-      text-align: left !important;
-      padding: 0 !important;
-      box-sizing: border-box !important;
-      background: transparent !important;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
     }
 
     .ip-tool-detail-box {
-      background-color: #eef4ff !important;
-      padding: 15px !important;
-      border-radius: 10px !important;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e3ebf5 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      transition: all 0.2s !important;
-      box-sizing: border-box !important;
-      width: 100% !important;
+      background: #f2f6ff;
+      border: 1px solid #dbe4f3;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      transition: all 0.2s;
     }
 
     .ip-tool-detail-box:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.10);
     }
 
     .ip-tool-detail-label {
       font-weight: 600;
-      color: #55637a;
+      font-size: 0.92rem;
+      color: #4b5563;
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
-      font-size: 0.9rem;
+      gap: 6px;
     }
 
     .ip-tool-detail-value {
-      font-weight: 700;
-      color: #1c2a3a;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      color: #111827;
       word-break: break-all;
+      font-weight: 700;
     }
 
     .ip-tool-flag {
@@ -105,14 +94,14 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
     #ip-tool-map {
       width: 100%;
       height: 350px;
-      margin-top: 30px;
-      border-radius: 14px;
+      margin-top: 28px;
+      border-radius: 16px;
       overflow: hidden;
     }
 
     .ip-tool-reload-btn {
-      margin-top: 25px;
-      padding: 12px 32px;
+      margin-top: 28px;
+      padding: 12px 30px;
       background: #2563eb;
       color: white;
       border: none;
@@ -129,17 +118,19 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
     .ip-tool-data-source {
       margin-top: 30px;
       font-size: 0.85rem;
-      color: #55637a;
-      text-align: center;
+      color: #6b7280;
     }
 
-    .ip-tool-data-source a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-
-    .ip-tool-data-source a:hover {
-      text-decoration: underline;
+    @media (max-width: 480px) {
+      .ip-tool-card {
+        padding: 22px;
+      }
+      .ip-tool-address {
+        font-size: 1.8rem;
+      }
+      #ip-tool-map {
+        height: 280px;
+      }
     }
   </style>
 </head>
@@ -159,14 +150,7 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
     <button class="ip-tool-reload-btn" id="reload">重新整理</button>
 
     <div class="ip-tool-data-source">
-      <p>數據來源：</p>
-      <p>
-        公開 IP 查詢由
-        <a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
-        提供；地理位置資訊由
-        <a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a>
-        提供。
-      </p>
+      公開 IP 查詢由 ipify 提供；地理位置資訊由 IPinfo 提供。
     </div>
   </main>
 
@@ -210,7 +194,7 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
           { label: '城市', value: info.city || 'N/A' },
           { label: '區域/州', value: info.region || 'N/A' },
           { label: '郵遞區號', value: info.postal || 'N/A' },
-          { label: '網際網路服務供應商 (ISP)', value: info.org || 'N/A' },
+          { label: '網路供應商 (ISP)', value: info.org || 'N/A' },
           { label: 'GPS 座標', value: info.loc ? info.loc.replace(',', ', ') : '0, 0' },
           { label: '時區', value: info.timezone || 'N/A' },
         ];
@@ -218,24 +202,28 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
         infoList.forEach(item => {
           const box = document.createElement('div');
           box.className = 'ip-tool-detail-box';
+
           const label = document.createElement('div');
           label.className = 'ip-tool-detail-label';
           label.textContent = item.label;
+
           if (item.flag) {
             const flagSpan = document.createElement('span');
             flagSpan.className = 'ip-tool-flag';
             flagSpan.textContent = item.flag;
             label.appendChild(flagSpan);
           }
+
           const value = document.createElement('div');
           value.className = 'ip-tool-detail-value';
           value.textContent = item.value;
+
           box.appendChild(label);
           box.appendChild(value);
           detailsEl.appendChild(box);
         });
 
-        let [lat, lon] = info.loc ? info.loc.split(",").map(c => parseFloat(c)) : [0, 0];
+        let [lat, lon] = info.loc ? info.loc.split(',').map(Number) : [0, 0];
 
         mapInstance = L.map('ip-tool-map').setView([lat, lon], 10);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
@@ -243,20 +231,18 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
           .bindPopup(`${info.city || '未知地點'}, ${info.country || ''}`)
           .openPopup();
 
-        mapInstance.invalidateSize();
+        setTimeout(() => mapInstance.invalidateSize(), 300);
 
       } catch (err) {
         ipEl.textContent = '載入失敗';
-        detailsEl.innerHTML = '<div class="ip-tool-detail-box" style="width:100%; justify-content:center;">無法載入 IP 詳細資訊，請稍後再試。</div>';
-        console.error(err);
+        detailsEl.innerHTML = '<div class="ip-tool-detail-box">無法載入資料</div>';
       }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("reload").onclick = fetchIP;
+      document.getElementById('reload').onclick = fetchIP;
       fetchIP();
     });
   </script>
-
 </body>
 </html>
