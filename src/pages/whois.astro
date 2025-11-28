@@ -18,11 +18,12 @@ const description = '查詢公開 IP、ISP 與地理位置';
       }
 
       .card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
+        background: var(--panel);
+        padding: 26px;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--border);
+        width: 100%;             /* ⭐ 確保永遠不超過螢幕 */
+        box-sizing: border-box;  /* ⭐ padding 不會把卡片撐爆 */
       }
 
       .title {
