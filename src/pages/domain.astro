@@ -13,16 +13,6 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
     <BaseHead title={title} description={description} />
 
     <style>
-      :root {
-        --bg: #ffffff;
-        --panel: #ffffff;
-        --border: rgba(0,0,0,0.1);
-        --muted: #6b7280;
-        --accent: #1e293b; /* 黑灰 Cloudflare */
-        --accent-hover: #0f172a;
-        --card-radius: 12px;
-      }
-
       body {
         background: var(--bg);
         margin: 0;
@@ -154,8 +144,9 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
           <input id="domainInput" placeholder="輸入 Domain，例如：example.com" />
           <button id="searchBtn">查詢</button>
         </div>
+      </div>
 
-        <div class="card">
+      <div class="card">
         <div class="title">查詢結果</div>
         <div class="grid" id="resultArea">
           <!-- 動態填入 -->
