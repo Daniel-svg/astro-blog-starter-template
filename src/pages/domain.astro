@@ -13,16 +13,18 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
     <BaseHead title={title} description={description} />
 
     <style>
-      main.container {
+        main.container {
         width: min(100% - 2rem, 860px);
         margin: 40px auto;
       }
+
       .source {
         text-align: center;
         color: #6b7280;
         margin-top: 12px;
         font-size: 0.9rem;
       }
+
       h1 {
         margin: 0 0 14px;
         font-size: 1.6rem;
@@ -38,7 +40,13 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       }
 
-     #domain-input {
+      #domain-form {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+      }
+
+      #domainInput {
         flex: 1;
         padding: 12px;
         border: 1px solid #d1d5db;
@@ -61,14 +69,17 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         background: #0f172a;
       }
 
-     @media (max-width: 780px) {
-      .card {
-         padding: 16px;  /* ⭐ 手機更舒服 */
-      }
-    }
-
-      .source {
-         text-align: center;
+      @media (max-width: 780px) {
+        .card {
+          padding: 16px;
+        }
+        #domain-form {
+          flex-direction: column;
+        }
+        #domainInput,
+        button {
+          width: 100%;
+        }
       }
 
       .result-box {
@@ -93,16 +104,19 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
       .label {
         color: var(--muted);
       }
+
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 16px;
       }
+
       .title {
         font-size: 1.6rem;
         font-weight: bold;
         margin-bottom: 16px;
       }
+
       .desc {
         font-size: 1rem;
         color: #6b7280;
@@ -118,8 +132,10 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         <div class="desc">使用 Cloudflare DNS-over-HTTPS 查詢 A / AAAA / NS / MX 記錄，並判斷是否可註冊。</div>
 
         <div class="domain-input ">
+         <form id="domain-form">
           <input id="domainInput" placeholder="輸入 Domain，例如：example.com" />
           <button id="searchBtn">查詢</button>
+         </form> 
         </div>
       </div>
 
