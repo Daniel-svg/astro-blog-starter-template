@@ -2,82 +2,108 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 
 const title = '我的 IP 查詢工具';
-const description = '快速查詢您的公開 IP 地址及地理位置資訊。';
 ---
 
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-	<BaseHead title={title} description={SITE_DESCRIPTION} />
-
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840" crossorigin="anonymous"></script>
+	<BaseHead title={title} />
 
 	<style>
 		body {
 			margin: 0;
 			padding: 0;
-			background: #f4f6fa;
+			background: #f5f7fb;
+			font-family: "Inter", system-ui, sans-serif;
+			color: #1f2d3d;
 		}
 
 		.ip-main-content {
-			max-width: 900px;
-			margin: 0 auto;
-			padding: 2em 1em;
+			max-width: 950px;
+			margin: 40px auto;
+			padding: 1.5em;
 		}
 
-		.card {
-			max-width: 650px;
-			margin: 0 auto;
-			padding: 30px;
-			background: #fff;
-			border-radius: 16px;
-			box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+		/** ------------------------------
+		    主 IP 顯示卡片
+		--------------------------------*/
+		.ip-card {
+			background: white;
+			border-radius: 18px;
+			padding: 40px;
+			box-shadow: 0 10px 35px rgba(0,0,0,0.08);
 			text-align: center;
 		}
 
-		.ip-address {
-			font-size: 2.4rem;
-			font-weight: bold;
-			background: #eef3ff;
-			padding: 15px;
-			border-radius: 12px;
-			margin-bottom: 25px;
-			color: #2a3a66;
+		.ip-title {
+			font-size: 1.6rem;
+			color: #3a475d;
+			margin-bottom: 12px;
+			font-weight: 600;
 		}
 
-		.details {
+		.ip-address {
+			font-size: 3.2rem;
+			font-weight: 800;
+			color: #2563eb;
+			padding: 16px;
+			background: #eef4ff;
+			border-radius: 12px;
+			display: inline-block;
+			margin-bottom: 24px;
+			letter-spacing: 1px;
+		}
+
+		/** ------------------------------
+		    詳細資訊
+		--------------------------------*/
+		.info-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-			gap: 15px;
-			margin-bottom: 30px;
-			text-align: left;
+			gap: 20px;
+			margin-top: 20px;
 		}
 
-		.detail-box {
+		.info-box {
 			background: #f0f4fa;
-			padding: 15px;
-			border-radius: 8px;
-			color: #333;
-			font-size: 0.95rem;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+			border-radius: 12px;
+			padding: 18px 20px;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
 		}
 
-		button {
-			padding: 12px 30px;
-			background: #505c82;
-			color: #fff;
+		.info-label {
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: #55637a;
+			text-transform: uppercase;
+			letter-spacing: .5px;
+		}
+
+		.info-value {
+			font-size: 1.1rem;
+			font-weight: 600;
+			color: #1c2a3a;
+		}
+
+		.reload-btn {
+			margin-top: 25px;
+			padding: 12px 32px;
+			background: #2563eb;
+			color: white;
 			border: none;
-			border-radius: 8px;
-			cursor: pointer;
+			border-radius: 10px;
 			font-size: 1rem;
-			transition: 0.2s;
+			cursor: pointer;
+			transition: 0.2s ease;
 		}
 
-		button:hover {
-			background: #3c4666;
+		.reload-btn:hover {
+			background: #1e4fc4;
 		}
 	</style>
 </head>
@@ -86,55 +112,79 @@ const description = '快速查詢您的公開 IP 地址及地理位置資訊。'
 	<Header />
 
 	<main class="ip-main-content">
-		<div class="card">
-			<h1>你的 IP 是</h1>
+
+		<div class="ip-card">
+			<div class="ip-title">你的目前公開 IP 地址</div>
+
 			<div class="ip-address" id="ip">載入中...</div>
 
-			<div class="details" id="details">
-				<div class="detail-box">國家：-</div>
-				<div class="detail-box">城市：-</div>
-				<div class="detail-box">ISP：-</div>
-				<div class="detail-box">時區：-</div>
+			<div class="info-grid" id="details">
+				<div class="info-box">
+					<div class="info-label">國家</div>
+					<div class="info-value">-</div>
+				</div>
+
+				<div class="info-box">
+					<div class="info-label">城市</div>
+					<div class="info-value">-</div>
+				</div>
+
+				<div class="info-box">
+					<div class="info-label">ISP</div>
+					<div class="info-value">-</div>
+				</div>
+
+				<div class="info-box">
+					<div class="info-label">時區</div>
+					<div class="info-value">-</div>
+				</div>
 			</div>
 
-			<button id="reloadBtn">重新整理</button>
+			<button class="reload-btn" id="reloadBtn">重新整理</button>
 		</div>
+
 	</main>
 
 	<Footer />
 
+<!-- ----------------------------
+     JavaScript
+----------------------------- -->
 <script>
 async function fetchIP() {
-	document.getElementById('ip').textContent = '載入中...';
-	document.getElementById('details').innerHTML = `
-		<div class="detail-box">國家：載入中</div>
-		<div class="detail-box">城市：載入中</div>
-		<div class="detail-box">ISP：載入中</div>
-		<div class="detail-box">時區：載入中</div>
+	const ipBox = document.getElementById('ip');
+	const details = document.getElementById('details');
+
+	ipBox.textContent = '載入中...';
+
+	details.innerHTML = `
+		<div class="info-box"><div class="info-label">國家</div><div class="info-value">載入中</div></div>
+		<div class="info-box"><div class="info-label">城市</div><div class="info-value">載入中</div></div>
+		<div class="info-box"><div class="info-label">ISP</div><div class="info-value">載入中</div></div>
+		<div class="info-box"><div class="info-label">時區</div><div class="info-value">載入中</div></div>
 	`;
 
 	try {
 		const ipRes = await fetch('https://api.ipify.org?format=json');
 		const { ip } = await ipRes.json();
+		ipBox.textContent = ip;
 
-		document.getElementById('ip').textContent = ip;
-
-		const infoRes = await fetch(\`https://ipinfo.io/\${ip}/json?token=1b172809b09566\`);
+		const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
 		const info = await infoRes.json();
 
-		document.getElementById('details').innerHTML = `
-			<div class="detail-box">國家：${info.country || '-'}</div>
-			<div class="detail-box">城市：${info.city || '-'}</div>
-			<div class="detail-box">ISP：${info.org || '-'}</div>
-			<div class="detail-box">時區：${info.timezone || '-'}</div>
+		details.innerHTML = `
+			<div class="info-box"><div class="info-label">國家</div><div class="info-value">${info.country || '-'}</div></div>
+			<div class="info-box"><div class="info-label">城市</div><div class="info-value">${info.city || '-'}</div></div>
+			<div class="info-box"><div class="info-label">ISP</div><div class="info-value">${info.org || '-'}</div></div>
+			<div class="info-box"><div class="info-label">時區</div><div class="info-value">${info.timezone || '-'}</div></div>
 		`;
-	} catch (e) {
-		document.getElementById('ip').textContent = '取得失敗';
-		document.getElementById('details').innerHTML = '<div class="detail-box">請稍後再試。</div>';
+	} catch (err) {
+		ipBox.textContent = '取得失敗';
+		details.innerHTML = `<div class="info-box"><div class="info-label">錯誤</div><div class="info-value">請稍後再試</div></div>`;
 	}
 }
 
-document.getElementById("reloadBtn").onclick = fetchIP;
+document.getElementById('reloadBtn').onclick = fetchIP;
 fetchIP();
 </script>
 
