@@ -166,55 +166,56 @@ const description = '快速查詢您的公開 IP 地址及地理位置資訊。'
 		
 		<Footer /> 
 		
-	<script>	
-		async function fetchIP() {
-    	const ipElement = document.getElementById('ip');
-		const detailsElement = document.getElementById('details');
-		
-    	ipElement.textContent = '載入中...';
-    	detailsElement.innerHTML = `
-       		<div class="detail-box"><i class="fas fa-globe"></i>國家：載入中</div>
-			<div class="detail-box"><i class="fas fa-city"></i>城市：載入中</div>
-			<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：載入中</div>
-			<div class="detail-box"><i class="fas fa-building"></i>ISP：載入中</div>
-			<div class="detail-box"><i class="fas fa-clock"></i>時區：載入中</div>
-			<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：載入中</div>
-    	`;
-		
-    	try {
-        		// 先取得 IP
-        		const ipRes = await fetch('https://api.ipify.org?format=json');
-        		const ipData = await ipRes.json();
-        		const ip = ipData.ip;
-        		ipElement.textContent = ip;
+			<script>	
+				async function fetchIP() {
+		    	const ipElement = document.getElementById('ip');
+				const detailsElement = document.getElementById('details');
+				
+		    	ipElement.textContent = '載入中...';
+		    	detailsElement.innerHTML = `
+		       		<div class="detail-box"><i class="fas fa-globe"></i>國家：載入中</div>
+					<div class="detail-box"><i class="fas fa-city"></i>城市：載入中</div>
+					<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：載入中</div>
+					<div class="detail-box"><i class="fas fa-building"></i>ISP：載入中</div>
+					<div class="detail-box"><i class="fas fa-clock"></i>時區：載入中</div>
+					<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：載入中</div>
+		    	`;
+				
+		    	try {
+		        		// 先取得 IP
+		        		const ipRes = await fetch('https://api.ipify.org?format=json');
+		        		const ipData = await ipRes.json();
+		        		const ip = ipData.ip;
+		        		ipElement.textContent = ip;
 
-        		// 再取得詳細資訊 (使用 ipinfo.io 的 API)
-				// 請確保您的 Token (1b172809b09566) 是有效的
-        		const infoRes = await fetch(\`https://ipinfo.io/${ip}/json?token=1b172809b09566\`);
-        		const infoData = await infoRes.json();
-				
-				// 處理經緯度 (loc 欄位是 "緯度,經度" 格式)
-				const [lat, lon] = (infoData.loc || '-,').split(',');
-				const latLonDisplay = infoData.loc ? \`${lat}, ${lon}\` : '-';
-				
-        		detailsElement.innerHTML = `
-            		<div class="detail-box"><i class="fas fa-globe"></i>國家：${infoData.country || '-'}</div>
-            		<div class="detail-box"><i class="fas fa-city"></i>城市：${infoData.city || '-'}</div>
-					<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：${infoData.region || '-'}</div>
-            		<div class="detail-box"><i class="fas fa-building"></i>ISP：${infoData.org ? infoData.org.split(' ')[0] : '-'}</div>
-            		<div class="detail-box"><i class="fas fa-clock"></i>時區：${infoData.timezone || '-'}</div>
-					<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：${latLonDisplay}</div>
-        		`;
-    	} catch (error) {
-				console.error("IP 查詢錯誤:", error);
-        		ipElement.textContent = '無法取得 IP';
-        		detailsElement.innerHTML = `
-            		<div class="detail-box"><i class="fas fa-exclamation-triangle"></i>載入失敗，請檢查網路或稍後再試</div>
-        		`;
-    	}
-	}
-	// 在頁面載入時執行一次
-	fetchIP();
+		        		// 再取得詳細資訊 (使用 ipinfo.io 的 API)
+						// 修正：移除跳脫字元 \
+		        		const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`); 
+		        		const infoData = await infoRes.json();
+						
+						// 處理經緯度 (loc 欄位是 "緯度,經度" 格式)
+						const [lat, lon] = (infoData.loc || '-,').split(',');
+						// 修正：移除跳脫字元 \
+						const latLonDisplay = infoData.loc ? `${lat}, ${lon}` : '-'; 
+						
+		        		detailsElement.innerHTML = `
+		            		<div class="detail-box"><i class="fas fa-globe"></i>國家：${infoData.country || '-'}</div>
+		            		<div class="detail-box"><i class="fas fa-city"></i>城市：${infoData.city || '-'}</div>
+							<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：${infoData.region || '-'}</div>
+		            		<div class="detail-box"><i class="fas fa-building"></i>ISP：${infoData.org ? infoData.org.split(' ')[0] : '-'}</div>
+		            		<div class="detail-box"><i class="fas fa-clock"></i>時區：${infoData.timezone || '-'}</div>
+							<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：${latLonDisplay}</div>
+		        		`;
+		    	} catch (error) {
+						console.error("IP 查詢錯誤:", error);
+		        		ipElement.textContent = '無法取得 IP';
+		        		detailsElement.innerHTML = `
+		            		<div class="detail-box"><i class="fas fa-exclamation-triangle"></i>載入失敗，請檢查網路或稍後再試</div>
+		        		`;
+		    	}
+			}
+			// 在頁面載入時執行一次
+			fetchIP();
 		</script>
 	</body>
 </html>
