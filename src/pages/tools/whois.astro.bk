@@ -62,7 +62,7 @@ const description = '查詢公開 IP、ISP 與地理位置';
     <Header />
     <main>
       <div class="card">
-        <div class="title">IP 查詢工具（Cloudflare 風格）</div>
+        <div class="title">IP 查詢工具</div>
         <form id="ip-form">
           <input id="ip-input" placeholder="輸入 IP，例如 8.8.8.8" />
           <button>查詢</button>

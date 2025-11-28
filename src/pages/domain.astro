@@ -92,14 +92,17 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         background: var(--accent-hover);
       }
 
-      /* 手機 RWD */
-      @media (max-width: 600px) {
-        .input-box {
-          flex-direction: column;
+     @media (max-width: 780px) {
+        .cf-card.top {
+          grid-template-columns: 1fr;
         }
-        button {
-          width: 100%;
-        }
+
+         .map-wrap {
+          margin-top: 12px;
+      }
+      .source {
+         text-align: center;
+      }
       }
 
       .result-box {
