@@ -1,5 +1,4 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import AdsRight from "../components/AdsRight.astro";
@@ -7,27 +6,26 @@ import AdsRight from "../components/AdsRight.astro";
 const { title, description } = Astro.props;
 ---
 
-<html lang="zh-Hant">
-  <head>
-    <BaseHead title={title} description={description} />
-  </head>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
 
-  <body>
-    <Header />
+  <!-- 全站只要載入一次 -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
+    crossorigin="anonymous"></script>
+</head>
 
-    <div style="display: flex; gap: 20px; justify-content: center;">
+<body>
+  <Header />
 
-      <!-- ⭐ 主內容區（佔最大空間） -->
-      <main style="flex: 1; max-width: 860px;">
-        <slot />
-      </main>
+  <main>
+    <slot />  <!-- 每頁內容 -->
+  </main>
 
-      <!-- ⭐ 右側廣告（固定寬度）-->
-      <aside style="width: 250px;">
-        <AdsRight />
-      </aside>
-    </div>
+  <AdsRight />  <!-- 全站右側浮動廣告 -->
 
-    <Footer />
-  </body>
+  <Footer />
+</body>
 </html>
