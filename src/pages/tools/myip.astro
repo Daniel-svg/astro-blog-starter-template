@@ -51,27 +51,29 @@ const description = '快速查詢你的公開 IP 地址與地理位置資訊';
     }
 
 	.details-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 自動調整欄位 */
-		gap: 15px; /* 格子間距 */
-		margin-bottom: 30px;
-		text-align: left;
-		padding: 10px;
-		box-sizing: border-box;
-		background: transparent; /* 移除背景，避免和子元素衝突 */
+		display: grid !important; /* 強制生效 */
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+		gap: 15px !important;
+		margin-bottom: 30px !important;
+		text-align: left !important;
+		padding: 0 !important;
+		box-sizing: border-box !important;
+		background: transparent !important;
 	}
 
 	.detail-box {
-		background-color: #eef4ff; /* 每個子項都有背景色 */
-		padding: 15px;
-		border-radius: 10px;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-		border: 1px solid #e3ebf5;
-		display: flex;
-		flex-direction: column;
-		transition: all 0.2s;
-		box-sizing: border-box;
+		background-color: #eef4ff !important;
+		padding: 15px !important;
+		border-radius: 10px !important;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+		border: 1px solid #e3ebf5 !important;
+		display: flex !important;
+		flex-direction: column !important;
+		transition: all 0.2s !important;
+		box-sizing: border-box !important;
+		width: 100% !important; /* 確保占滿欄位 */
 	}
+
 
 	.detail-box:hover {
 		transform: translateY(-3px);
