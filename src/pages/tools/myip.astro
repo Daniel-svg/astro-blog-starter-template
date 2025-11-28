@@ -39,7 +39,7 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
         }
 
         main.container {
-          max-width: 1100px;
+          max-width: 1400px;
           margin: 36px auto;
           padding: 24px;
         }
@@ -51,8 +51,8 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
           border-radius: var(--card-radius);
           padding: 22px;
           display: grid;
-          grid-template-columns: 1fr 420px;
-          gap: var(--gap);
+          grid-template-columns: 1fr 1fr; /* 左右均分 */
+          gap: 32px;
           align-items: start;
           box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
@@ -208,14 +208,17 @@ const description = '查詢公開 IP、ISP 與地理位置（Cloudflare 風格�
           color: var(--muted);
           font-size: 0.85rem;
         }
-
+        main.wide {
+          width: 1200px !important;
+          max-width: 95% !important;
+        }
     </style>
   </head>
 
   <body>
     <Header />
 
-    <main class="container">
+    <main class="container wide">
       <div class="top-card" role="region" aria-label="IP 查詢總覽">
         <div class="left">
           <div class="title">公開 IP 與地理位置</div>
