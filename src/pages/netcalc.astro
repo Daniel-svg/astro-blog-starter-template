@@ -64,16 +64,15 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     .input-group {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 14px;
-      margin-bottom: 20px;
+      gap: 16px; /* ⭐ 保證兩欄時也不重疊 */
     }
 
     @media (min-width: 760px) {
       .input-group {
         grid-template-columns: 1fr 1fr;
+        gap: 16px; /* ⭐ Windows 必加，不然兩欄會黏在一起 */
       }
     }
-
     input[type="text"] {
       padding: 14px 16px;
       border: 1px solid #d1d5db;
@@ -81,7 +80,10 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
       background: #f9fafb;
       font-size: 1rem;
       width: 100%;
+      min-height: 48px;   /* ⭐ 保證 Windows Edge 不會變矮 */
+      line-height: 1.4;   /* ⭐ 避免 Windows 字體撐爆 */
       transition: 0.25s;
+      box-sizing: border-box;
     }
 
     input[type="text"]:focus {
@@ -89,6 +91,8 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
       background: #fff;
       box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
     }
+
+
 
     /* ===== Button ===== */
     .calculate-btn {
