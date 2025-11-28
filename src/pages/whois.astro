@@ -15,7 +15,10 @@ const description = '查詢公開 IP、ISP 與地理位置';
        width: min(100% - 2rem, 860px);
        margin: 40px auto;
       }
-
+      main.container {
+        width: min(100% - 2rem, 860px);
+        margin: 40px auto;
+      }
       .card {
         background: var(--panel);
         padding: 26px;
@@ -97,7 +100,7 @@ const description = '查詢公開 IP、ISP 與地理位置';
 
   <body>
     <Header />
-    <main>
+    <main class="container">
       <div class="card">
         <div class="title">IP 查詢工具</div>
         <form id="ip-form">
