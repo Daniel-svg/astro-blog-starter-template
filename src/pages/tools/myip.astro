@@ -12,148 +12,209 @@ const description = '快速查詢您的公開 IP 地址及地理位置資訊。'
 <!doctype html>
 <html lang="zh-Hant">
 	<head>
-		<!-- 這是您頁面的頭部資訊，包含了基礎樣式和 meta 標籤 -->
-		<BaseHead title={title} description={SITE_DESCRIPTION} /> 
+		<BaseHead title={title} description={SITE_DESCRIPTION} /> 
 		
-		<!-- 這裡放置 Google AdSense 腳本 -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1y6w3p0G6g7G1xL2nC9n8FzVj9hK4k5L5gD5j6g7O2xS4i5xP7xT7p8D2o4b4g7C6g5e7M5w6X9G3gH4m1o5Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 		<script async src="[https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840](https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840)" crossorigin="anonymous"></script>
 
-		<!-- 專門為 IP 查詢工具添加的 CSS 樣式 (解決格式跑掉、置中和編譯問題) -->
 		<style>
 			/* 確保 Header 和 Footer 之間的主內容區塊置中 */
 			.ip-main-content {
 				width: calc(100% - 2em);
 				max-width: 1200px;
-				margin: 0 auto; /* 核心置中樣式 */
+				margin: 0 auto;
 				padding: 2em 1em;
 			}
 			
-			/* IP 卡片樣式 */
+			/* IP 卡片樣式 (Google Material 風格) */
 			.card {
-				max-width: 600px;
-				margin: 40px auto; /* 內容卡片置中 */
-				padding: 30px;
+				max-width: 700px;
+				margin: 40px auto;
+				padding: 40px;
 				background-color: #ffffff;
-				border-radius: 16px;
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-				text-align: center; /* 讓卡片內的文字置中 */
+				border-radius: 12px;
+				/* Material Design 陰影 */
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.05);
+				text-align: center;
+				transition: all 0.3s ease;
 			}
 
 			.card h1 {
-				font-size: 1.5rem;
-				color: #333;
-				margin-bottom: 1rem;
+				font-size: 1.8rem;
+				color: #3c4043;
+				margin-bottom: 0.5rem;
+				font-weight: 400;
 			}
 
 			.ip-address {
-				font-size: 2.5rem;
-				font-weight: bold;
-				color: #555; /* 主題色 */
-				background-color: #f7f9fc;
-				padding: 15px;
-				border-radius: 10px;
-				margin-bottom: 25px;
+				font-family: 'Roboto Mono', monospace;
+				font-size: 2.8rem;
+				font-weight: 700;
+				color: #1a73e8;
+				background-color: #e8f0fe;
+				padding: 20px;
+				border-radius: 8px;
+				margin-bottom: 30px;
 				word-break: break-all;
+				display: inline-block;
 			}
 
 			/* 詳細資訊網格佈局 */
 			.details {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 				gap: 15px;
 				margin-bottom: 30px;
-				text-align: center; /* 讓詳細資訊的文字靠左 */
+				text-align: left;
 			}
 
 			.detail-box {
-				background-color: #f0f4f8;
+				background-color: #f8f9fa;
 				padding: 15px;
 				border-radius: 8px;
-				font-size: 0.95rem;
-				color: #555;
+				font-size: 1rem;
+				color: #5f6368;
 				font-weight: 500;
-				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+				border-left: 4px solid #4285f4;
+				display: flex;
+				align-items: center;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+			}
+			
+			/* 圖示樣式 */
+			.detail-box i {
+				margin-right: 10px;
+				color: #1a73e8;
+				font-size: 1.1rem;
+				width: 20px;
+				text-align: center;
 			}
 
 			.card button {
 				padding: 12px 30px;
-				background-color: #555;
+				background-color: #4285f4;
 				color: white;
 				border: none;
 				border-radius: 8px;
 				cursor: pointer;
 				font-size: 1rem;
-				font-weight: bold;
-				transition: background-color 0.2s ease;
+				font-weight: 500;
+				transition: background-color 0.2s ease, box-shadow 0.2s ease;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				margin-bottom: 20px; /* 為資料來源騰出空間 */
 			}
 
-			.card {
-   				 max-width: 600px;
-   				 margin: 40px auto; /* 確保卡片本身水平置中 */
-   			 /* ... 其他屬性 ... */
-    			text-align: center; /* 讓卡片內的 H1 和 IP 地址置中 */
+			.card button:hover {
+				background-color: #3367d6;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+			}
+
+			/* 新增資料來源區塊樣式 */
+			.data-source {
+				margin-top: 25px;
+				padding-top: 15px;
+				border-top: 1px solid #e0e0e0;
+				font-size: 0.85rem;
+				color: #70757a; /* Google 淺灰色文字 */
+				text-align: center;
+			}
+
+			.data-source a {
+				color: #1a73e8;
+				text-decoration: none;
+				font-weight: 500;
+			}
+			
+			.data-source a:hover {
+				text-decoration: underline;
 			}
 		</style>
 	</head>
 	<body>
-		<!-- 這裡放置 Header 元件，這是確保 Header 顯示的關鍵 -->
-		<Header /> 
+		<Header /> 
 		
-		<!-- main 標籤應用置中樣式 -->
 		<main class="ip-main-content">
-			<!-- 您的 IP 查詢內容，使用 card class 確保美觀和置中 -->
 			<div class="card">
-				<h1>你的 IP 是</h1>
+				<h1>🌐 您的公開 IP 地址是</h1>
 				<div class="ip-address" id="ip">載入中...</div>
 				
 				<div class="details" id="details">
-					<div class="detail-box">國家：-</div>
-					<div class="detail-box">城市：-</div>
-					<div class="detail-box">ISP：-</div>
-					<div class="detail-box">時區：-</div>
+					<div class="detail-box"><i class="fas fa-globe"></i>國家：載入中</div>
+					<div class="detail-box"><i class="fas fa-city"></i>城市：載入中</div>
+					<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：載入中</div>
+					<div class="detail-box"><i class="fas fa-building"></i>ISP：載入中</div>
+					<div class="detail-box"><i class="fas fa-clock"></i>時區：載入中</div>
+					<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：載入中</div>
 				</div>
 				
-				<button onclick="fetchIP()">重新整理</button>
+				<button onclick="fetchIP()">重新整理 / 再次查詢</button>
+				
+				<div class="data-source">
+					<p>數據來源：</p>
+					<p>
+						公開 IP 查詢由 
+						<a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
+						提供；地理位置資訊由 
+						<a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
+						提供。
+					</p>
+				</div>
+				
 			</div>
 		</main>
 		
-		<!-- 這裡放置 Footer 元件，這是確保 Footer 顯示的關鍵 -->
-		<Footer /> 
+		<Footer /> 
+		
 	<script>	
-		<!-- JavaScript 邏輯 -->
-	async function fetchIP() {
-    	document.getElementById('ip').textContent = '載入中...';
-    	document.getElementById('details').innerHTML = `
-       		<div class="detail-box">國家：載入中</div>
-			<div class="detail-box">城市：載入中</div>
-			<div class="detail-box">ISP：載入中</div>
-			<div class="detail-box">時區：載入中</div>
-    	`;
-    try {
-        // 先取得 IP
-        const ipRes = await fetch('https://api.ipify.org?format=json');
-        const ipData = await ipRes.json();
-        const ip = ipData.ip;
-        document.getElementById('ip').textContent = ip;
+		async function fetchIP() {
+    	const ipElement = document.getElementById('ip');
+		const detailsElement = document.getElementById('details');
+		
+    	ipElement.textContent = '載入中...';
+    	detailsElement.innerHTML = `
+       		<div class="detail-box"><i class="fas fa-globe"></i>國家：載入中</div>
+			<div class="detail-box"><i class="fas fa-city"></i>城市：載入中</div>
+			<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：載入中</div>
+			<div class="detail-box"><i class="fas fa-building"></i>ISP：載入中</div>
+			<div class="detail-box"><i class="fas fa-clock"></i>時區：載入中</div>
+			<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：載入中</div>
+    	`;
+		
+    	try {
+        		// 先取得 IP
+        		const ipRes = await fetch('https://api.ipify.org?format=json');
+        		const ipData = await ipRes.json();
+        		const ip = ipData.ip;
+        		ipElement.textContent = ip;
 
-        // 再取得詳細資訊
-        const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
-        const infoData = await infoRes.json();
-
-        document.getElementById('details').innerHTML = `
-            <div class="detail-box">國家：${infoData.country || '-'}</div>
-            <div class="detail-box">城市：${infoData.city || '-'}</div>
-            <div class="detail-box">ISP：${infoData.org || '-'}</div>
-            <div class="detail-box">時區：${infoData.timezone || '-'}</div>
-        `;
-    } catch (error) {
-        document.getElementById('ip').textContent = '無法取得 IP';
-        document.getElementById('details').innerHTML = `
-            <div class="detail-box">請稍後再試</div>
-        `;
-    }
-}
-fetchIP();
+        		// 再取得詳細資訊 (使用 ipinfo.io 的 API)
+				// 請確保您的 Token (1b172809b09566) 是有效的
+        		const infoRes = await fetch(\`https://ipinfo.io/${ip}/json?token=1b172809b09566\`);
+        		const infoData = await infoRes.json();
+				
+				// 處理經緯度 (loc 欄位是 "緯度,經度" 格式)
+				const [lat, lon] = (infoData.loc || '-,').split(',');
+				const latLonDisplay = infoData.loc ? \`${lat}, ${lon}\` : '-';
+				
+        		detailsElement.innerHTML = `
+            		<div class="detail-box"><i class="fas fa-globe"></i>國家：${infoData.country || '-'}</div>
+            		<div class="detail-box"><i class="fas fa-city"></i>城市：${infoData.city || '-'}</div>
+					<div class="detail-box"><i class="fas fa-map-marker-alt"></i>地區/州：${infoData.region || '-'}</div>
+            		<div class="detail-box"><i class="fas fa-building"></i>ISP：${infoData.org ? infoData.org.split(' ')[0] : '-'}</div>
+            		<div class="detail-box"><i class="fas fa-clock"></i>時區：${infoData.timezone || '-'}</div>
+					<div class="detail-box"><i class="fas fa-map-pin"></i>經緯度：${latLonDisplay}</div>
+        		`;
+    	} catch (error) {
+				console.error("IP 查詢錯誤:", error);
+        		ipElement.textContent = '無法取得 IP';
+        		detailsElement.innerHTML = `
+            		<div class="detail-box"><i class="fas fa-exclamation-triangle"></i>載入失敗，請檢查網路或稍後再試</div>
+        		`;
+    	}
+	}
+	// 在頁面載入時執行一次
+	fetchIP();
 		</script>
 	</body>
 </html>
