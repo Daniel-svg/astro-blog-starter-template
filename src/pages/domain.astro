@@ -38,28 +38,12 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       }
 
-      /* Cloudflare 風格輸入區 */
-      .input-box {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 18px;
-        width: 100%;
-      }
-
-      .input-box input {
+     #domain-input {
         flex: 1;
-        padding: 14px 16px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        font-size: 1rem;
-        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
         box-sizing: border-box;
-      }
-
-      .input-box input:focus {
-        border-color: #555;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
       }
 
       button {
@@ -133,7 +117,7 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
         <h1>Domain 查詢工具</h1>
         <div class="desc">使用 Cloudflare DNS-over-HTTPS 查詢 A / AAAA / NS / MX 記錄，並判斷是否可註冊。</div>
 
-        <div class="input-box">
+        <div class="domain-input ">
           <input id="domainInput" placeholder="輸入 Domain，例如：example.com" />
           <button id="searchBtn">查詢</button>
         </div>
