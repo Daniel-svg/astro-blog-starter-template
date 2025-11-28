@@ -11,7 +11,6 @@ const title = '我的 IP 查詢工具';
 <head>
 	<BaseHead title={title} />
 	
-	<!-- Leaflet 地圖套件 -->
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -25,95 +24,119 @@ const title = '我的 IP 查詢工具';
 		}
 
 		.main-container {
-			max-width: 1000px;
+			max-width: 800px;
 			margin: 40px auto;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 20px;
 			padding: 1.5em;
 		}
 
 		.card {
 			background: white;
-			padding: 40px;
+			padding: 30px;
 			border-radius: 18px;
 			box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-		}
-
-		.ip-title {
-			font-size: 1.6rem;
-			color: #3a475d;
-			margin-bottom: 12px;
-			font-weight: 600;
+			width: 100%;
 			text-align: center;
 		}
 
+		.ip-title {
+			font-size: 1.4rem;
+			color: #3a475d;
+			margin-bottom: 12px;
+			font-weight: 600;
+		}
+
 		.ip-address {
-			font-size: 3rem;
+			font-size: 2.5rem;
 			font-weight: 800;
 			color: #2563eb;
 			background: #eef4ff;
 			padding: 10px 20px;
 			border-radius: 12px;
-			text-align: center;
-			margin: 0 auto 20px;
 			display: inline-block;
+			margin-bottom: 20px;
 		}
 
 		.info-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-			gap: 20px;
-			margin-top: 30px;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 15px;
+			margin-top: 20px;
 		}
 
 		.info-box {
 			background: #f0f4fa;
-			padding: 16px 20px;
+			padding: 12px 16px;
 			border-radius: 12px;
 			box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+			text-align: center;
 		}
 
 		.info-label {
-			font-size: .85rem;
+			font-size: .8rem;
 			font-weight: 600;
 			color: #55637a;
 			text-transform: uppercase;
+			margin-bottom: 4px;
+			display: block;
 		}
 
-		/* 新增讓國旗和 Country 同行顯示 */
 		.info-label-flag {
 			display: inline-flex;
 			align-items: center;
-			gap: 8px;
+			gap: 6px;
+			justify-content: center;
 		}
 
 		.flag {
-			font-size: 1.8rem;
+			font-size: 1.5rem;
 			vertical-align: middle;
 		}
 
 		.info-value {
-			font-size: 1.1rem;
-			font-weight: 600;
+			font-size: 1rem;
+			font-weight: 500;
 			color: #1c2a3a;
+			padding: 6px 0;
+			border-top: 1px solid #dce0eb;
 			margin-top: 4px;
 		}
 
 		#map {
 			width: 100%;
-			height: 350px;
-			margin-top: 30px;
+			height: 300px;
+			margin-top: 20px;
 			border-radius: 14px;
 			overflow: hidden;
 		}
 
 		.reload-btn {
-			margin-top: 25px;
-			padding: 12px 32px;
+			margin-top: 20px;
+			padding: 10px 28px;
 			background: #2563eb;
 			color: white;
 			border: none;
 			border-radius: 10px;
-			font-size: 1rem;
+			font-size: .95rem;
 			cursor: pointer;
+			width: 100%;
+			max-width: 200px;
+			text-align: center;
+		}
+
+		.data-source {
+			text-align: center;
+			font-size: .85rem;
+			color: #55637a;
+			margin-top: 10px;
+		}
+
+		.data-source a {
+			color: #2563eb;
+			text-decoration: none;
 		}
 	</style>
 </head>
@@ -124,10 +147,8 @@ const title = '我的 IP 查詢工具';
 	<main class="main-container">
 
 		<div class="card">
-
 			<div class="ip-title">你的公開 IP 地址</div>
 			<div class="ip-address" id="ip">載入中...</div>
-			<!-- 移除國旗顯示的 span -->
 
 			<div class="info-grid" id="details"></div>
 
@@ -139,11 +160,11 @@ const title = '我的 IP 查詢工具';
 		<div class="data-source">
 			<p>數據來源：</p>
 			<p>
-			公開 IP 查詢由 
-			<a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
-			提供；地理位置資訊由 
-			<a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
-			提供。
+				公開 IP 查詢由 
+				<a href="https://www.ipify.org/" target="_blank" rel="noopener noreferrer">ipify</a>
+				提供；地理位置資訊由 
+				<a href="https://ipinfo.io/" target="_blank" rel="noopener noreferrer">IPinfo</a> 
+				提供。
 			</p>		
 		</div>
 	</main>
@@ -151,7 +172,6 @@ const title = '我的 IP 查詢工具';
 	<Footer />
 
 <script>
-// 國家代碼轉 Unicode 國旗
 function countryToFlag(countryCode) {
 	if (!countryCode) return "❓";
 	return countryCode
@@ -172,7 +192,6 @@ async function fetchIP() {
 	const infoRes = await fetch(`https://ipinfo.io/${ip}/json?token=1b172809b09566`);
 	const info = await infoRes.json();
 
-	// 詳細資料（Country 行加入國旗）
 	document.getElementById('details').innerHTML = `
 		<div class="info-box">
 			<div class="info-label info-label-flag">
@@ -180,21 +199,40 @@ async function fetchIP() {
 			</div>
 			<div class="info-value">${info.country}</div>
 		</div>
-		<div class="info-box"><div class="info-label">City</div><div class="info-value">${info.city}</div></div>
-		<div class="info-box"><div class="info-label">Region</div><div class="info-value">${info.region}</div></div>
-		<div class="info-box"><div class="info-label">ISP</div><div class="info-value">${info.org}</div></div>
-		<div class="info-box"><div class="info-label">ASN</div><div class="info-value">${info.org?.split(" ")[0] || '-'}</div></div>
-		<div class="info-box"><div class="info-label">GPS</div><div class="info-value">${info.loc ? info.loc.replace(',', ', ') : '0, 0'}</div></div>
-		<div class="info-box"><div class="info-label">Timezone</div><div class="info-value">${info.timezone}</div></div>
-		<div class="info-box"><div class="info-label">VPN / Proxy</div><div class="info-value">
-			${info.privacy?.vpn ? '✔ VPN' : '❌ No'}
-		</div></div>
+		<div class="info-box">
+			<div class="info-label">City</div>
+			<div class="info-value">${info.city}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">Region</div>
+			<div class="info-value">${info.region}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">ISP</div>
+			<div class="info-value">${info.org}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">ASN</div>
+			<div class="info-value">${info.org?.split(" ")[0] || '-'}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">GPS</div>
+			<div class="info-value">${info.loc ? info.loc.replace(',', ', ') : '0, 0'}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">Timezone</div>
+			<div class="info-value">${info.timezone}</div>
+		</div>
+		<div class="info-box">
+			<div class="info-label">VPN / Proxy</div>
+			<div class="info-value">
+				${info.privacy?.vpn ? '✔ VPN' : '❌ No'}
+			</div>
+		</div>
 	`;
 
-	// 經緯度分離（避免 null 或 undefined）
 	let [lat, lon] = info.loc ? info.loc.split(",") : [0,0];
 
-	// Leaflet 地圖
 	let map = L.map('map').setView([lat, lon], 10);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
