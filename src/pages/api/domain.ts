@@ -12,17 +12,21 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   async function query(type: string) {
-    const res = await fetch(
-      `https://cloudflare-dns.com/dns-query?name=${domain}&type=${type}`,
-      {
-        headers: {
-          "Accept": "application/dns-json",
-          "User-Agent": "Astro-DNS-Client"
+    try {
+      const res = await fetch(
+        `https://1.1.1.1/dns-query?name=${domain}&type=${type}`,
+        {
+          method: "GET",
+          headers: {
+            "accept": "application/dns-json"
+          }
         }
-      }
-    );
+      );
 
-    return res.json().catch(() => null);
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
   }
 
   const A = await query("A");

@@ -30,7 +30,6 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
 
     <!-- 專屬 CSS -->
 <style>
-    /* ===== 整體背景 ===== */
   body {
     background: #f5f7fb;
     margin: 0;
@@ -38,7 +37,6 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
       "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   }
 
-  /* ===== 主卡片 ===== */
   .calculator-container {
     background: #ffffff;
     padding: 2rem;
@@ -54,7 +52,6 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
   }
 
-  /* ===== 標題 ===== */
   h1 {
     font-size: 1.9rem;
     color: #1f2937;
@@ -64,11 +61,6 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     gap: 10px;
   }
 
-  h1 i {
-    color: #555;
-  }
-
-  /* ===== 輸入區塊 ===== */
   .input-group {
     display: grid;
     grid-template-columns: 1fr;
@@ -89,22 +81,21 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     background: #f9fafb;
     font-size: 1rem;
     transition: 0.25s;
-    box-sizing: border-box;
     width: 100%;
   }
 
   input[type="text"]:focus {
-    border-color: #2563eb;
+    border-color: #000;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
   }
 
-  /* ===== 按鈕 ===== */
+  /* ====== 按鈕（黑灰色） ====== */
   .calculate-btn {
     padding: 14px 20px;
     border-radius: 10px;
     border: none;
-    background: #2563eb;
+    background: #1f1f1f;
     color: #fff;
     width: 100%;
     font-size: 1.05rem;
@@ -115,10 +106,10 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
   }
 
   .calculate-btn:hover {
-    background: #2563eb;
+    background: #000;
   }
 
-  /* ===== 二進位切換 ===== */
+  /* 二進位切換 */
   .toggle-bin {
     display: inline-flex;
     align-items: center;
@@ -135,10 +126,9 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
 
   .toggle-bin:hover {
     background: #e5e7eb;
-    color: #1f2937;
   }
 
-  /* ===== 結果區 ===== */
+  /* ====== 結果區 ====== */
   .results {
     margin-top: 22px;
     display: flex;
@@ -155,6 +145,16 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+
+    /* ⭐ 新增 hover 特效 ⭐ */
+    transition: 0.25s;
+  }
+
+  /* ⭐ 滑過去時效果：微浮起 + 陰影 + 放大 ⭐ */
+  .results > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border-color: #d1d5db;
   }
 
   .results strong {
@@ -169,20 +169,17 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     word-break: break-word;
   }
 
-  /* ===== 重點結果（跟 myip 同調性） ===== */
+  /* 重點結果（藍框維持原樣） */
   .primary-result {
     background: #eff6ff !important;
     border-left: 4px solid #2563eb !important;
-    border-radius: 12px;
   }
 
-  /* ===== 二進位小字 ===== */
   .binary-val {
     font-size: 0.82rem;
     color: #6b7280;
   }
 
-  /* ===== 錯誤訊息 ===== */
   .error-message {
     background: #fee2e2;
     border: 1px solid #fecaca;
@@ -193,18 +190,22 @@ const description = '網段計算機，提供快速查詢可用IP位址、子網
     text-align: center;
   }
 
-  /* ===== 手機響應式修正（不跑版） ===== */
+  /* 📱 防止手機輸入框溢出 card */
   @media (max-width: 480px) {
-    .results strong {
-      width: 100%;
-    }
-
-    .calculator-container {
-      padding: 1.3rem;
-      margin: 1rem;
-    }
+  input[type="text"],
+  .calculate-btn,
+  .toggle-bin {
+    max-width: 100%;
+    box-sizing: border-box; /* ⭐ 修正重點 */
   }
+
+  .input-group {
+    width: 100%;
+  }
+}
+
 </style>
+
 </head>
 
 <body>
