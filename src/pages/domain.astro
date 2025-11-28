@@ -144,45 +144,94 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
     </main>
     <Footer />
 
-    <script>
-      const input = document.getElementById("domainInput");
-      const btn = document.getElementById("searchBtn");
-      const area = document.getElementById("resultArea");
+<script>
+  const input = document.getElementById("domainInput");
+  const btn = document.getElementById("searchBtn");
+  const area = document.getElementById("resultArea");
 
-      btn.addEventListener("click", search);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") search();
-      });
+  btn.addEventListener("click", search);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") search();
+  });
 
-      async function search() {
-        const domain = input.value.trim();
-        if (!domain) return;
+  // 查詢 Cloudflare DoH
+  async function queryDNS(domain, type) {
+    const url = `https://cloudflare-dns.com/dns-query?name=${domain}&type=${type}`;
+    const res = await fetch(url, {
+      headers: { "accept": "application/dns-json" }
+    });
+    return res.json();
+  }
 
-        area.innerHTML = `<div class="result-box">查詢中...</div>`;
+  function parseAnswer(ans) {
+    if (!ans || !ans.Answer) return null;
+    return ans.Answer.map(r => `${r.data} <span style="color:#64748b;">(TTL ${r.TTL})</span>`).join("<br>");
+  }
 
-        try {
-          const res = await fetch(`/api/domain?domain=${domain}`);
-          const data = await res.json();
+  async function search() {
+    const domain = input.value.trim();
+    if (!domain) return;
 
-          if (data.error) {
-            area.innerHTML = `<div class="result-box">❌ ${data.error}</div>`;
-            return;
-          }
+    area.innerHTML = `<div class="result-box">查詢中...</div>`;
 
-          area.innerHTML = `
-            <div class="result-box">
-              <div class="row"><span class="label">Domain</span><span>${data.domain}</span></div>
-              <div class="row"><span class="label">可用？</span><span>${data.available ? '✅ 可註冊' : '❌ 已被使用'}</span></div>
-              <div class="row"><span class="label">A</span><span>${data.A || '—'}</span></div>
-              <div class="row"><span class="label">AAAA</span><span>${data.AAAA || '—'}</span></div>
-              <div class="row"><span class="label">NS</span><span>${data.NS || '—'}</span></div>
-              <div class="row"><span class="label">MX</span><span>${data.MX || '—'}</span></div>
-            </div>
-          `;
-        } catch (err) {
-          area.innerHTML = `<div class="result-box">❌ 查詢失敗（請稍後再試）</div>`;
-        }
-      }
-    </script>
+    try {
+      const [A, AAAA, CNAME, TXT, MX, NS, SOA, DNSKEY] = await Promise.all([
+        queryDNS(domain, "A"),
+        queryDNS(domain, "AAAA"),
+        queryDNS(domain, "CNAME"),
+        queryDNS(domain, "TXT"),
+        queryDNS(domain, "MX"),
+        queryDNS(domain, "NS"),
+        queryDNS(domain, "SOA"),
+        queryDNS(domain, "DNSKEY")
+      ]);
+
+      const result = {
+        A: parseAnswer(A),
+        AAAA: parseAnswer(AAAA),
+        CNAME: parseAnswer(CNAME),
+        TXT: TXT.Answer ? TXT.Answer.map(r => r.data.replace(/"/g, "")).join("<br>") : null,
+        MX: MX.Answer ? MX.Answer.map(r => r.data).join("<br>") : null,
+        NS: parseAnswer(NS),
+        SOA: SOA.Answer ? SOA.Answer.map(r => r.data).join("<br>") : null,
+        DNSSEC: DNSKEY.Answer ? "🟢 啟用" : "🔴 未啟用",
+        available: A.Status === 3 && AAAA.Status === 3 && MX.Status === 3 // NXDOMAIN
+      };
+
+      area.innerHTML = `
+        <div class="result-box">
+
+          <div class="row">
+            <span class="label">Domain</span><span>${domain}</span>
+          </div>
+
+          <div class="row">
+            <span class="label">可用？</span>
+            <span>${result.available ? '✅ 可註冊' : '❌ 已被使用'}</span>
+          </div>
+
+          <div class="row"><span class="label">A</span><span>${result.A || '—'}</span></div>
+          <div class="row"><span class="label">AAAA</span><span>${result.AAAA || '—'}</span></div>
+          <div class="row"><span class="label">CNAME</span><span>${result.CNAME || '—'}</span></div>
+          <div class="row"><span class="label">MX</span><span>${result.MX || '—'}</span></div>
+          <div class="row"><span class="label">NS</span><span>${result.NS || '—'}</span></div>
+
+          <div class="row"><span class="label">TXT</span><span>${result.TXT || '—'}</span></div>
+
+          <div class="row"><span class="label">SOA</span>
+            <span style="text-align:right">${result.SOA || '—'}</span>
+          </div>
+
+          <div class="row"><span class="label">DNSSEC</span><span>${result.DNSSEC}</span></div>
+
+        </div>
+      `;
+    } catch (err) {
+      area.innerHTML = `<div class="result-box">❌ 查詢失敗（請稍後再試）</div>`;
+    }
+  }
+</script>
+
+
   </body>
 </html>
