@@ -1,29 +1,28 @@
+---
+// AdsRight.astro
+---
 <style>
-  .right-ads {
-    position: fixed;
-    right: 12px;
-    top: 120px;
+  .sidebar-ads {
     width: 300px;
-    z-index: 9999;
+    margin-left: 24px;
   }
 
-  /* 手機自動隱藏（AdSense 規定不能在手機放 fixed 廣告） */
-  @media (max-width: 768px) {
-    .right-ads {
-      display: none;
+  @media (max-width: 900px) {
+    .sidebar-ads {
+      display: none; /* 手機與窄螢幕隱藏 sidebar */
     }
   }
 </style>
 
-<div class="right-ads">
-    <!-- google-ad -->
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-6026639928482840"
-        data-ad-slot="8483122106"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+<div class="sidebar-ads">
+  <!-- google-ad -->
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-6026639928482840"
+      data-ad-slot="8483122106"
+      data-ad-format="rectangle"
+      data-full-width-responsive="false"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
 </div>
