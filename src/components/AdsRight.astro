@@ -1,28 +1,29 @@
----
-// AdsRight.astro
----
 <style>
-  .sidebar-ads {
+  .right-sidebar-ads {
+    position: fixed;
+    right: 16px;
+    top: 120px;
     width: 300px;
-    margin-left: 24px;
+    max-width: 300px;
+    z-index: 9999;
   }
 
-  @media (max-width: 900px) {
-    .sidebar-ads {
-      display: none; /* 手機與窄螢幕隱藏 sidebar */
+  /* 手機隱藏，避免違規 */
+  @media (max-width: 768px) {
+    .right-sidebar-ads {
+      display: none;
     }
   }
 </style>
 
-<div class="sidebar-ads">
-  <!-- google-ad -->
-  <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-6026639928482840"
-      data-ad-slot="8483122106"
-      data-ad-format="rectangle"
-      data-full-width-responsive="false"></ins>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
+<div class="right-sidebar-ads">
+    <ins class="adsbygoogle"
+        style="display:block;"
+        data-ad-client="ca-pub-6026639928482840"
+        data-ad-slot="8483122106"
+        data-ad-format="rectangle"
+        data-full-width-responsive="false"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 </div>
