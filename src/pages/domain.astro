@@ -2,7 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ads from '../components/AdsRight.astro';
+import AdsRight from '../components/AdsRight.astro';
 
 const title = 'Domain 查詢工具';
 const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄與是否可用';
@@ -123,9 +123,9 @@ const description = '使用 Cloudflare DNS-over-HTTPS 查詢 A/AAAA/NS/MX 記錄
     </style>
   </head>
   <body>
-    <Ads />
     <Header />
     <main class="container">
+      <AdsRight />
       <div class="card">
         <h1>Domain 查詢工具</h1>
         <div class="desc">使用 Cloudflare DNS-over-HTTPS 查詢 A / AAAA / NS / MX 記錄，並判斷是否可註冊。</div>
