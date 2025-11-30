@@ -3,6 +3,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import AdsRight from '../components/AdsRight.astro';
 ---
 
 <!doctype html>
@@ -17,6 +18,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                 border-radius: 8px;
                 border-left: 5px solid #555;
             }
+		  .right-ads {
+				position: fixed;
+				right: 12px;
+				top: 120px;
+				width: 300px;
+				z-index: 9999;
+			}
+
+			/* 手機自動隱藏（AdSense 規定不能在手機放 fixed 廣告） */
+			@media (max-width: 768px) {
+				.right-ads {
+				display: none;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -76,17 +91,19 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			}
 			fetchNextHoliday();
 		</script>
-		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
-			crossorigin="anonymous"></script>
-		<!-- google-ad -->
-		<ins class="adsbygoogle"
-			style="display:block"
-			data-ad-client="ca-pub-6026639928482840"
-			data-ad-slot="8483122106"
-			data-ad-format="auto"
-			data-full-width-responsive="true"></ins>
-		<script>
-			(adsbygoogle = window.adsbygoogle || []).push({});
-		</script>
+		<div class="right-ads">
+			<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6026639928482840"
+				crossorigin="anonymous"></script>
+			<!-- google-ad -->
+			<ins class="adsbygoogle"
+				style="display:block"
+				data-ad-client="ca-pub-6026639928482840"
+				data-ad-slot="8483122106"
+				data-ad-format="auto"
+				data-full-width-responsive="true"></ins>
+			<script>
+				(adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+		</div>		
 	</body>
 </html>
